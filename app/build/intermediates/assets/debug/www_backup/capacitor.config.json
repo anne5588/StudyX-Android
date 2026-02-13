@@ -1,0 +1,9 @@
+{
+  "appId": "com.studyx.app",
+  "appName": "StudyX记忆引擎",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

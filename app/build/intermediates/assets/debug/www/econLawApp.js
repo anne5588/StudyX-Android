@@ -35,10 +35,26 @@ Object.assign(app, {
                 ? item.content[0] 
                 : item.content;
             
+            // 获取学习状态
+            const lastRecord = userData.studyRecords[item.id];
+            let statusBadge = '';
+            if (lastRecord) {
+                const statusMap = {
+                    fuzzy: { text: '没记住', class: 'status-fuzzy', emoji: '😵' },
+                    normal: { text: '一般', class: 'status-normal', emoji: '😐' },
+                    mastered: { text: '已掌握', class: 'status-mastered', emoji: '😎' }
+                };
+                const status = statusMap[lastRecord.status];
+                statusBadge = `<span class="card-status ${status.class}">${status.emoji} ${status.text}</span>`;
+            } else {
+                statusBadge = `<span class="card-status status-none">未学习</span>`;
+            }
+            
             return `
                 <div class="knowledge-card" onclick="app.showEconLawDetail('${item.id}')">
                     <div class="knowledge-header">
                         <span class="knowledge-type" style="background: ${moduleInfo.color}">${this.getTypeName(item.type)}</span>
+                        ${statusBadge}
                     </div>
                     <h4 class="knowledge-title">${item.title}</h4>
                     <p class="knowledge-content">${contentPreview ? contentPreview.substring(0, 80) : ''}...</p>
@@ -70,12 +86,28 @@ Object.assign(app, {
         // 更新模块标题
         document.getElementById('econlaw-study-module').textContent = moduleInfo.name;
 
+        // 获取上次学习状态
+        const lastRecord = userData.studyRecords[id];
+        let lastStatusHtml = '';
+        if (lastRecord) {
+            const statusMap = {
+                fuzzy: { text: '没记住', class: 'last-status-fuzzy', emoji: '😵' },
+                normal: { text: '一般', class: 'last-status-normal', emoji: '😐' },
+                mastered: { text: '已掌握', class: 'last-status-mastered', emoji: '😎' }
+            };
+            const status = statusMap[lastRecord.status];
+            lastStatusHtml = `<span class="last-study-status ${status.class}">${status.emoji} ${status.text}</span>`;
+        }
+        
         // 填充全屏内容
         document.getElementById('econlaw-study-content').innerHTML = `
             <div class="study-detail-card">
                 <div class="study-detail-header">
                     <span class="study-type-badge" style="background: ${moduleInfo.color}">${this.getTypeName(item.type)}</span>
-                    <h2 class="study-detail-title">${item.title}</h2>
+                    <div class="study-title-row">
+                        <h2 class="study-detail-title">${item.title}</h2>
+                        ${lastStatusHtml}
+                    </div>
                     ${item.examYears ? `<p class="study-detail-meta">真题：${item.examYears.join('、')}年</p>` : ''}
                 </div>
                 
@@ -131,7 +163,12 @@ Object.assign(app, {
     },
     
     studyEconLaw(id, status) {
+        // 记录学习状态
         this.studyKnowledge(id, status);
+        // 关闭弹窗
+        this.closeEconLawStudy();
+        // 刷新卡片状态显示
+        this.renderEconLawGrid();
     },
 
     // ========== 英语单词学习 ==========

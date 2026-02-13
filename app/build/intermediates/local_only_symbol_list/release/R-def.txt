@@ -1,0 +1,36 @@
+R_DEF: Internal format may change without notice
+local
+color accent
+color black
+color primary
+color primary_dark
+color purple_200
+color purple_500
+color purple_700
+color teal_200
+color teal_700
+color white
+drawable ic_launcher_foreground
+id loadingText
+id progressBar
+id swipeRefresh
+id webView
+id webViewRefresh
+layout activity_main
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string check_update
+string download_complete
+string download_failed
+string downloading
+string loading
+string no_update
+string update_later
+string update_message
+string update_now
+string update_title
+style Theme.StudyX
+style Theme.StudyX.NoActionBar
+xml file_paths
+xml network_security_config
