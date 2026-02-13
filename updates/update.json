@@ -1,0 +1,8 @@
+{
+  "versionCode": 1,
+  "versionName": "1.0.0",
+  "minVersionCode": 1,
+  "downloadUrl": "https://your-server.com/updates/studyx_v1.0.0.zip",
+  "description": "初始版本",
+  "force": false
+}

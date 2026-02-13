@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>StudyX 记忆引擎 - 小忆AI学习助手</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边导航 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🎯</span>
+                <span class="logo-text">StudyX</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="today">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">今日任务</span>
+                </li>
+                <li class="nav-item" data-page="econlaw">
+                    <span class="nav-icon">⚖️</span>
+                    <span class="nav-text">经济法学习</span>
+                </li>
+                <li class="nav-item" data-page="vocabulary">
+                    <span class="nav-icon">🔤</span>
+                    <span class="nav-text">英语单词</span>
+                    <span class="badge" id="vocab-badge">--</span>
+                </li>
+                <li class="nav-item" data-page="quiz">
+                    <span class="nav-icon">🎲</span>
+                    <span class="nav-text">记忆抽测</span>
+                    <span class="badge" id="quiz-badge">5</span>
+                </li>
+                <li class="nav-item" data-page="review">
+                    <span class="nav-icon">🔄</span>
+                    <span class="nav-text">复习中心</span>
+                    <span class="badge" id="review-badge">3</span>
+                </li>
+                <li class="nav-item" data-page="stats">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">学习数据</span>
+                </li>
+                <li class="nav-item" data-page="schedule">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">学习计划</span>
+                </li>
+                <li class="nav-item" data-page="videos">
+                    <span class="nav-icon">🎬</span>
+                    <span class="nav-text">视频课程</span>
+                    <span class="badge" id="video-badge">--</span>
+                </li>
+                <li class="nav-item" data-page="daily">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">学习日报</span>
+                </li>
+                <li class="nav-item" data-page="reports">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">周报月报</span>
+                </li>
+            </ul>
+            
+            <!-- 备份数据按钮（放在菜单外避免事件冲突） -->
+            <div class="nav-backup-wrapper">
+                <button class="nav-backup-btn" onclick="if(window.backupRestoreUI){backupRestoreUI.showModal()}else{alert('备份模块未加载，请刷新页面')}"
+                        title="备份或恢复学习数据">
+                    <span class="nav-icon">💾</span>
+                    <span class="nav-text">数据备份</span>
+                </button>
+            </div>
+            <div class="sidebar-footer">
+                <button class="backup-btn" onclick="if(window.backupRestoreUI){backupRestoreUI.showModal()}else{alert('备份模块未加载，请刷新页面')}" title="备份或恢复学习数据">
+                    <span class="backup-icon">💾</span>
+                    <span class="backup-text">备份数据</span>
+                </button>
+                <div class="exam-countdown" onclick="app.showExamDateModal()" title="点击设置考试日期">
+                    <span class="countdown-label">距离考试</span>
+                    <span class="countdown-days" id="exam-countdown">--</span>
+                    <span class="countdown-unit">天</span>
+                    <span class="countdown-edit">✏️</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 手机端专用底部导航 -->
+        <nav class="mobile-nav" style="display: none;">
+            <div class="mobile-nav-item active" data-page="today">
+                <span class="nav-icon">📅</span>
+                <span>首页</span>
+            </div>
+            <div class="mobile-nav-item" data-page="econlaw">
+                <span class="nav-icon">📚</span>
+                <span>学习</span>
+            </div>
+            <div class="mobile-nav-item" data-page="vocabulary">
+                <span class="nav-icon">🔤</span>
+                <span>英语</span>
+            </div>
+            <div class="mobile-nav-item" data-page="review">
+                <span class="nav-icon">🔄</span>
+                <span>复习</span>
+            </div>
+            <div class="mobile-nav-item" data-page="more">
+                <span class="nav-icon">⚙️</span>
+                <span>更多</span>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="header">
+                <h1 class="page-title" id="page-title">今日任务</h1>
+                <div class="header-actions">
+                    <div class="study-time">
+                        <span class="time-icon">⏱️</span>
+                        <span class="time-text">今日学习: <strong id="today-time">0</strong> 分钟</span>
+                    </div>
+                    <div class="user-info" id="user-info" onclick="loginUI.showModal()">
+                        <span class="user-avatar" id="user-avatar">👤</span>
+                        <span class="welcome-text" id="welcome-text">你好，备考人 💪</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <!-- 今日任务页面 -->
+                <div class="page active" id="page-today">
+                    <!-- 手机端顶部信息栏 -->
+                    <div class="mobile-top-bar">
+                        <div class="study-time-mobile">
+                            <span>⏱️</span>
+                            <span>今日学习: <strong id="today-time-mobile">0</strong> 分钟</span>
+                        </div>
+                        <div class="user-info-mobile" onclick="loginUI.showModal()">
+                            <span id="user-avatar-mobile">👤</span>
+                            <span id="welcome-text-mobile">登录/注册</span>
+                        </div>
+                    </div>
+                    
+                    <div class="welcome-card">
+                        <div class="welcome-avatar">🧠</div>
+                        <div class="welcome-text-content">
+                            <h2>你好！我是小忆，你的AI学习助手 🎯</h2>
+                            <p>今天是 <span id="today-date"></span>，坚持就是胜利！根据艾宾浩斯遗忘曲线，今天有 <strong id="today-review-count">--</strong> 个知识点需要复习。</p>
+                        </div>
+                    </div>
+
+                    <div class="today-stats">
+                        <div class="stat-card">
+                            <span class="stat-icon">📚</span>
+                            <span class="stat-value" id="today-new">--</span>
+                            <span class="stat-label">新学知识点</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">🔄</span>
+                            <span class="stat-value" id="today-review">--</span>
+                            <span class="stat-label">待复习</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">✅</span>
+                            <span class="stat-value" id="today-completed">--</span>
+                            <span class="stat-label">已完成</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-icon">🔥</span>
+                            <span class="stat-value" id="streak-days">--</span>
+                            <span class="stat-label">连续天数</span>
+                        </div>
+                    </div>
+
+                    <div class="today-tasks">
+                        <h3>📋 今日学习任务</h3>
+                        <div class="task-list" id="today-task-list">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 快速开始 - 新设计 -->
+                    <div class="quick-start-section">
+                        <h3 class="section-title">⚡ 快速开始</h3>
+                        <div class="quick-start-grid">
+                            <div class="quick-start-card primary" onclick="app.startStudy()">
+                                <div class="card-icon">📖</div>
+                                <div class="card-info">
+                                    <span class="card-title">开始学习</span>
+                                    <span class="card-desc">继续上次的进度</span>
+                                </div>
+                                <span class="card-arrow">›</span>
+                            </div>
+                            <div class="quick-start-card" onclick="app.startQuiz()">
+                                <div class="card-icon">🎲</div>
+                                <div class="card-info">
+                                    <span class="card-title">随机抽测</span>
+                                    <span class="card-desc">检验记忆效果</span>
+                                </div>
+                                <span class="card-arrow">›</span>
+                            </div>
+                            <div class="quick-start-card" onclick="app.startReview()">
+                                <div class="card-icon">🔄</div>
+                                <div class="card-info">
+                                    <span class="card-title">开始复习</span>
+                                    <span class="card-desc">今日需复习 0 个</span>
+                                </div>
+                                <span class="card-arrow">›</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 经济法学习页面 -->
+                <div class="page" id="page-econlaw">
+                    <!-- 顶部工具栏 -->
+                    <div class="econlaw-toolbar">
+                        <div class="toolbar-search">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" placeholder="搜索知识点..." id="econlaw-search-input">
+                        </div>
+                        <div class="toolbar-actions">
+                            <span id="knowledge-count" style="font-size: 13px; color: var(--text-secondary);">共 0 个</span>
+                            <button class="toolbar-btn" onclick="app.showEconDataModal()" title="导入/导出">
+                                💾
+                            </button>
+                            <button class="toolbar-btn primary" onclick="app.showAddKnowledgeModal()" title="添加知识点">
+                                ➕
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 掌握程度筛选 -->
+                    <div class="mastery-filter">
+                        <button class="mastery-btn active" data-mastery="all">全部</button>
+                        <button class="mastery-btn" data-mastery="fuzzy">😵 没记住</button>
+                        <button class="mastery-btn" data-mastery="normal">😐 一般</button>
+                        <button class="mastery-btn" data-mastery="mastered">😎 已掌握</button>
+                    </div>
+                    
+                    <!-- 分类标签（点击选中/取消） -->
+                    <div class="module-filter">
+                        <button class="filter-btn" data-module="socialism">社会主义市场经济</button>
+                        <button class="filter-btn" data-module="fiscal">财政学</button>
+                        <button class="filter-btn" data-module="international">国际经济学</button>
+                        <button class="filter-btn" data-module="banking">货币银行</button>
+                        <button class="filter-btn" data-module="western">西方经济学</button>
+                    </div>
+                    
+                    <!-- 题型筛选（点击选中/取消） -->
+                    <div class="type-filter">
+                        <button class="type-btn" data-type="term">名词解释</button>
+                        <button class="type-btn" data-type="choice">选择题</button>
+                        <button class="type-btn" data-type="short">简答题</button>
+                    </div>
+
+                    <div class="knowledge-grid" id="econlaw-grid">
+                        <!-- 动态生成知识卡片 -->
+                    </div>
+                </div>
+
+                <!-- 英语单词页面 - 简洁首页 -->
+                <div class="page" id="page-vocabulary">
+                    <div class="page-header">
+                        <h2>🔤 英语单词学习</h2>
+                        <div class="toolbar-actions">
+                            <button class="toolbar-btn" onclick="app.showVocabDataModal()" title="导入/导出">
+                                💾
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="page-content">
+                        <!-- 词汇等级列表 -->
+                        <div class="vocab-levels-list">
+                            <div class="vocab-level-card" onclick="app.startVocabStudy('basic')">
+                                <div class="level-info">
+                                    <span class="level-icon">📗</span>
+                                    <div class="level-text">
+                                        <span class="level-name">基础词汇</span>
+                                        <span class="level-count" id="basic-count">加载中...</span>
+                                    </div>
+                                </div>
+                                <span class="level-arrow">›</span>
+                            </div>
+                            <div class="vocab-level-card" onclick="app.startVocabStudy('intermediate')">
+                                <div class="level-info">
+                                    <span class="level-icon">📙</span>
+                                    <div class="level-text">
+                                        <span class="level-name">中级词汇</span>
+                                        <span class="level-count" id="intermediate-count">加载中...</span>
+                                    </div>
+                                </div>
+                                <span class="level-arrow">›</span>
+                            </div>
+                            <div class="vocab-level-card" onclick="app.startVocabStudy('advanced')">
+                                <div class="level-info">
+                                    <span class="level-icon">📘</span>
+                                    <div class="level-text">
+                                        <span class="level-name">高级词汇</span>
+                                        <span class="level-count" id="advanced-count">加载中...</span>
+                                    </div>
+                                </div>
+                                <span class="level-arrow">›</span>
+                            </div>
+                            <div class="vocab-level-card" onclick="app.startVocabStudy('phrase')">
+                                <div class="level-info">
+                                    <span class="level-icon">📕</span>
+                                    <div class="level-text">
+                                        <span class="level-name">词组搭配</span>
+                                        <span class="level-count" id="phrase-count">加载中...</span>
+                                    </div>
+                                </div>
+                                <span class="level-arrow">›</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 学习统计 -->
+                        <div class="vocab-stats-simple">
+                            <div class="vocab-stat-item">
+                                <span class="stat-num" id="vocab-total">0</span>
+                                <span class="stat-label">总词汇</span>
+                            </div>
+                            <div class="vocab-stat-item">
+                                <span class="stat-num" id="vocab-learning">0</span>
+                                <span class="stat-label">学习中</span>
+                            </div>
+                            <div class="vocab-stat-item">
+                                <span class="stat-num" id="vocab-mastered">0</span>
+                                <span class="stat-label">已掌握</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 学习明细 -->
+                        <div class="vocab-detail-list">
+                            <h4>📊 学习明细</h4>
+                            <div class="detail-header">
+                                <span>等级</span>
+                                <span>总词汇</span>
+                                <span>学习中</span>
+                                <span>已掌握</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-name">📗 基础词汇</span>
+                                <span id="basic-detail">
+                                    <span class="detail-total">-</span>
+                                    <span class="detail-learning">-</span>
+                                    <span class="detail-mastered">-</span>
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-name">📙 中级词汇</span>
+                                <span id="intermediate-detail">
+                                    <span class="detail-total">-</span>
+                                    <span class="detail-learning">-</span>
+                                    <span class="detail-mastered">-</span>
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-name">📘 高级词汇</span>
+                                <span id="advanced-detail">
+                                    <span class="detail-total">-</span>
+                                    <span class="detail-learning">-</span>
+                                    <span class="detail-mastered">-</span>
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-name">📕 词组搭配</span>
+                                <span id="phrase-detail">
+                                    <span class="detail-total">-</span>
+                                    <span class="detail-learning">-</span>
+                                    <span class="detail-mastered">-</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 全屏单词学习界面 -->
+                <div class="fullscreen-modal" id="vocab-study-modal" style="display: none;">
+                    <div class="fullscreen-header">
+                        <button class="back-btn" onclick="app.closeVocabStudy()">‹ 返回</button>
+                        <span class="fullscreen-title" id="vocab-study-title">基础词汇</span>
+                        <select class="group-selector" id="group-selector" onchange="app.switchGroup(this.value)">
+                            <option value="1">第1组</option>
+                        </select>
+                    </div>
+                    
+                    <div class="fullscreen-content">
+                        <!-- 进度条和导航 -->
+                        <div class="study-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="vocab-progress-fill"></div>
+                            </div>
+                            <div class="progress-nav">
+                                <button class="nav-arrow" onclick="app.prevWord()">◀</button>
+                                <span class="progress-text" id="vocab-progress-text">1 / 10</span>
+                                <button class="nav-arrow" onclick="app.nextWord()">▶</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 单词卡片 -->
+                        <div class="study-card">
+                            <div class="word-display">
+                                <h1 class="study-word" id="current-word">abandon</h1>
+                                <p class="study-phonetic" id="current-phonetic">/əˈbændən/</p>
+                                <button class="sound-btn" onclick="app.playWordSound()">🔊</button>
+                            </div>
+                            
+                            <div class="meaning-display" id="meaning-section" style="display: none;">
+                                <div class="study-meaning" id="current-meaning">v. 放弃，遗弃 n. 放纵</div>
+                                <div class="study-similar" id="similar-words">
+                                    <span>相似词：desert, forsake, quit</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 操作按钮 -->
+                        <div class="study-actions">
+                            <button class="action-btn primary" id="show-meaning-btn" onclick="app.showWordMeaning()">显示词意</button>
+                            <div class="feedback-btns" id="feedback-btns" style="display: none;">
+                                <button class="feedback-btn wrong" onclick="app.markWord('wrong')">🤔 不认识</button>
+                                <button class="feedback-btn vague" onclick="app.markWord('vague')">😐 模糊</button>
+                                <button class="feedback-btn correct" onclick="app.markWord('correct')">😊 认识</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 记忆抽测页面 -->
+                <div class="page" id="page-quiz">
+                    <div class="quiz-setup" id="quiz-setup">
+                        <h2>🎲 记忆抽测</h2>
+                        <p>选择抽测范围和题型，检验你的记忆效果</p>
+                        
+                        <div class="quiz-options">
+                            <div class="option-group">
+                                <label>知识模块</label>
+                                <select id="quiz-module">
+                                    <option value="all">全部模块</option>
+                                    <option value="socialism">社会主义市场经济</option>
+                                    <option value="fiscal">财政学</option>
+                                    <option value="international">国际经济学</option>
+                                    <option value="banking">货币银行</option>
+                                    <option value="western">西方经济学</option>
+                                </select>
+                            </div>
+                            <div class="option-group">
+                                <label>题型</label>
+                                <select id="quiz-type">
+                                    <option value="all">全部题型</option>
+                                    <option value="choice">选择题考点</option>
+                                    <option value="term">名词解释</option>
+                                    <option value="short">简答题</option>
+                                </select>
+                            </div>
+                            <div class="option-group">
+                                <label>题目数量</label>
+                                <select id="quiz-count">
+                                    <option value="5">5题</option>
+                                    <option value="10" selected>10题</option>
+                                    <option value="20">20题</option>
+                                    <option value="30">30题</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="start-quiz-btn" onclick="app.generateQuiz()">开始抽测</button>
+                    </div>
+
+                    <div class="quiz-container" id="quiz-container" style="display: none;">
+                        <div class="quiz-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="quiz-progress-fill"></div>
+                            </div>
+                            <span class="progress-text" id="quiz-progress-text">1/10</span>
+                        </div>
+                        
+                        <div class="quiz-card" id="quiz-card">
+                            <div class="quiz-question">
+                                <span class="question-type" id="question-type">名词解释</span>
+                                <h3 id="question-text">什么是"免费搭车行为"？</h3>
+                            </div>
+                            <div class="quiz-answer-section">
+                                <button class="show-answer-btn" onclick="app.showAnswer()">显示答案</button>
+                                <div class="quiz-answer" id="quiz-answer" style="display: none;">
+                                    <div class="answer-content" id="answer-content"></div>
+                                    <div class="memory-tip" id="memory-tip"></div>
+                                </div>
+                            </div>
+                            <div class="quiz-feedback" id="quiz-feedback" style="display: none;">
+                                <p>这个知识点掌握得如何？</p>
+                                <div class="feedback-buttons">
+                                    <button class="feedback-btn fuzzy" onclick="app.recordFeedback('fuzzy')">
+                                        <span>😵</span> 模糊/错误
+                                    </button>
+                                    <button class="feedback-btn normal" onclick="app.recordFeedback('normal')">
+                                        <span>😐</span> 一般/犹豫
+                                    </button>
+                                    <button class="feedback-btn mastered" onclick="app.recordFeedback('mastered')">
+                                        <span>😎</span> 熟练/秒答
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="quiz-nav">
+                            <button class="nav-btn" onclick="app.prevQuestion()" id="prev-btn">上一题</button>
+                            <button class="nav-btn primary" onclick="app.nextQuestion()" id="next-btn">下一题</button>
+                        </div>
+                    </div>
+
+                    <div class="quiz-result" id="quiz-result" style="display: none;">
+                        <div class="result-header">
+                            <span class="result-icon">🎉</span>
+                            <h2>抽测完成！</h2>
+                        </div>
+                        <div class="result-stats">
+                            <div class="result-item">
+                                <span class="result-label">总题数</span>
+                                <span class="result-value" id="result-total">10</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">熟练</span>
+                                <span class="result-value mastered" id="result-mastered">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">一般</span>
+                                <span class="result-value normal" id="result-normal">0</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">模糊</span>
+                                <span class="result-value fuzzy" id="result-fuzzy">0</span>
+                            </div>
+                        </div>
+                        <div class="result-message" id="result-message"></div>
+                        <div class="result-actions">
+                            <button class="action-btn" onclick="app.restartQuiz()">再测一次</button>
+                            <button class="action-btn primary" onclick="app.goToReview()">去复习薄弱点</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 复习中心页面 -->
+                <div class="page" id="page-review">
+                    <div class="review-header">
+                        <h2>🔄 艾宾浩斯复习中心</h2>
+                        <p>根据遗忘曲线，科学安排复习</p>
+                    </div>
+
+                    <div class="review-priority">
+                        <div class="priority-card urgent">
+                            <div class="priority-icon">🔥</div>
+                            <div class="priority-info">
+                                <h4>紧急复习</h4>
+                                <p>记忆强度 &lt; 30%，即将遗忘</p>
+                                <span class="priority-count" id="urgent-count">0</span>
+                            </div>
+                            <button class="priority-btn" onclick="app.startPriorityReview('urgent')">立即复习</button>
+                        </div>
+                        <div class="priority-card normal">
+                            <div class="priority-icon">⚡</div>
+                            <div class="priority-info">
+                                <h4>巩固强化</h4>
+                                <p>记忆强度 30%-70%，需要巩固</p>
+                                <span class="priority-count" id="normal-count">0</span>
+                            </div>
+                            <button class="priority-btn" onclick="app.startPriorityReview('normal')">开始复习</button>
+                        </div>
+                        <div class="priority-card mastered">
+                            <div class="priority-icon">✅</div>
+                            <div class="priority-info">
+                                <h4>长期记忆</h4>
+                                <p>记忆强度 &gt; 70%，间隔复习</p>
+                                <span class="priority-count" id="mastered-count">0</span>
+                            </div>
+                            <button class="priority-btn" onclick="app.startPriorityReview('mastered')">保持记忆</button>
+                        </div>
+                    </div>
+
+                    <div class="review-schedule">
+                        <h3>📅 今日复习计划</h3>
+                        <div class="schedule-list" id="review-schedule-list">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学习数据页面 -->
+                <div class="page" id="page-stats">
+                    <div class="stats-overview">
+                        <div class="overview-card">
+                            <span class="overview-icon">📚</span>
+                            <div class="overview-info">
+                                <span class="overview-value" id="total-knowledge">0</span>
+                                <span class="overview-label">知识点总数</span>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-icon">✅</span>
+                            <div class="overview-info">
+                                <span class="overview-value" id="learned-knowledge">0</span>
+                                <span class="overview-label">已学习</span>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-icon">🎯</span>
+                            <div class="overview-info">
+                                <span class="overview-value" id="mastered-rate">0%</span>
+                                <span class="overview-label">掌握率</span>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <span class="overview-icon">⏱️</span>
+                            <div class="overview-info">
+                                <span class="overview-value" id="total-study-time">0</span>
+                                <span class="overview-label">学习时长(小时)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-charts">
+                        <div class="chart-card">
+                            <h4>模块掌握度</h4>
+                            <div class="module-progress" id="module-progress">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <h4>近7天学习趋势</h4>
+                            <div class="trend-chart" id="trend-chart">
+                                <!-- 简化的柱状图 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-achievements">
+                        <h4>🏆 学习成就</h4>
+                        <div class="achievements-grid" id="achievements-grid">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学习计划页面 -->
+                <div class="page" id="page-schedule">
+                    <div class="schedule-calendar">
+                        <h2>📅 2-3月学习计划</h2>
+                        <div class="calendar-nav">
+                            <button class="cal-nav-btn" onclick="app.prevMonth()">◀</button>
+                            <span class="cal-month" id="calendar-month">2026年2月</span>
+                            <button class="cal-nav-btn" onclick="app.nextMonth()">▶</button>
+                        </div>
+                        <div class="calendar-grid" id="calendar-grid">
+                            <!-- 动态生成日历 -->
+                        </div>
+                    </div>
+
+                    <div class="schedule-detail" id="schedule-detail">
+                        <h3>📋 今日详细安排</h3>
+                        <div class="detail-content" id="schedule-detail-content">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 视频课程页面 -->
+                <div class="page" id="page-videos">
+                    <div class="videos-header">
+                        <h2>🎬 视频课程学习跟踪</h2>
+                        <div class="videos-stats">
+                            <div class="video-stat">
+                                <span class="stat-num" id="video-total">0</span>
+                                <span class="stat-label">总课程</span>
+                            </div>
+                            <div class="video-stat">
+                                <span class="stat-num" id="video-watched">0</span>
+                                <span class="stat-label">已观看</span>
+                            </div>
+                            <div class="video-stat">
+                                <span class="stat-num" id="video-skipped">0</span>
+                                <span class="stat-label">已跳过</span>
+                            </div>
+                            <div class="video-stat">
+                                <span class="stat-num" id="video-review">0</span>
+                                <span class="stat-label">已复习</span>
+                            </div>
+                            <div class="video-stat">
+                                <span class="stat-num" id="video-progress">0%</span>
+                                <span class="stat-label">总进度</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="videos-search-box">
+                        <input type="text" id="video-search-input" placeholder="输入简称搜索，如：财政、国经、英初、微观...">
+                        <button class="search-btn" onclick="app.searchVideos()">🔍</button>
+                    </div>
+                    <div class="videos-tabs">
+                        <button class="tab-btn active" data-tab="all">全部视频</button>
+                        <button class="tab-btn" data-tab="econ">经济学</button>
+                        <button class="tab-btn" data-tab="eng">英语</button>
+                    </div>
+                    <div class="videos-filter">
+                        <button class="filter-btn active" data-filter="all">全部</button>
+                        <button class="filter-btn" data-filter="planned">计划中</button>
+                        <button class="filter-btn" data-filter="watched">已观看</button>
+                        <button class="filter-btn" data-filter="skipped">已跳过</button>
+                        <button class="filter-btn" data-filter="reviewed">已复习</button>
+                        <button class="filter-btn" data-filter="missed">漏看</button>
+                    </div>
+
+                    <div class="videos-list" id="videos-list">
+                        <!-- 动态生成视频列表 -->
+                    </div>
+                </div>
+
+                <!-- 日报页面 -->
+                <div class="page" id="page-daily">
+                    <div class="daily-header">
+                        <h2>📝 学习日报</h2>
+                        <p>今日学习自动记录，补充感受与计划即可</p>
+                    </div>
+
+                    <div class="daily-container">
+                        <div class="daily-editor">
+                            <div class="editor-header">
+                                <h3>✏️ 写日报</h3>
+                                <div class="date-selector">
+                                    <input type="date" id="daily-date-input" value="" max="">
+                                    <span class="editor-date" id="daily-editor-date"></span>
+                                </div>
+                            </div>
+                            <div class="editor-form">
+                                <!-- 自动生成：今日学习 -->
+                                <div class="form-group auto-section">
+                                    <label>📚 今日学习（自动生成）</label>
+                                    <div class="auto-content" id="daily-auto-content">
+                                        <p class="loading-text">正在加载今日学习记录...</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- 手动填写：学习感受 -->
+                                <div class="form-group">
+                                    <label>💭 学习感受 / 难点 / 收获</label>
+                                    <textarea id="daily-feeling" rows="5" placeholder="今天学得怎么样？有什么不懂的地方？有什么收获？"></textarea>
+                                </div>
+                                
+                                <!-- 手动填写：明日计划 -->
+                                <div class="form-group">
+                                    <label>📅 明日计划</label>
+                                    <textarea id="daily-plan" rows="2" placeholder="明天打算学什么？"></textarea>
+                                </div>
+                                
+                                <button class="save-daily-btn" onclick="app.saveDailyReport()">💾 保存日报</button>
+                            </div>
+                        </div>
+
+                        <div class="daily-list">
+                            <h3>📋 历史日报</h3>
+                            <div class="daily-items" id="daily-items">
+                                <!-- 动态生成日报列表 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日报详情弹窗 -->
+                <div class="modal" id="daily-detail-modal" style="display: none;">
+                    <div class="modal-content daily-modal-content">
+                        <div class="modal-header">
+                            <h3 id="daily-modal-date">📅 日报详情</h3>
+                            <button class="modal-close" onclick="app.closeDailyModal()">×</button>
+                        </div>
+                        <div class="modal-body" id="daily-modal-body">
+                            <!-- 动态生成日报详情 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 周报月报页面 -->
+                <div class="page" id="page-reports">
+                    <div class="reports-header">
+                        <h2>📈 学习报告</h2>
+                        <div class="report-tabs">
+                            <button class="report-tab active" onclick="app.switchReportTab('weekly')">周报</button>
+                            <button class="report-tab" onclick="app.switchReportTab('monthly')">月报</button>
+                        </div>
+                    </div>
+
+                    <!-- 周报 -->
+                    <div class="report-content" id="weekly-report">
+                        <div class="report-controls">
+                            <select id="week-selector" onchange="app.loadWeeklyReport(this.value)">
+                                <option value="">选择周次...</option>
+                            </select>
+                            <button class="generate-btn" onclick="app.generateWeeklyReport()">🔄 生成本周周报</button>
+                        </div>
+                        <div class="report-card" id="weekly-content">
+                            <div class="report-empty">
+                                <span class="empty-icon">📝</span>
+                                <p>选择周次或点击生成按钮查看周报</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 月报 -->
+                    <div class="report-content" id="monthly-report" style="display: none;">
+                        <div class="report-controls">
+                            <select id="month-selector" onchange="app.loadMonthlyReport(this.value)">
+                                <option value="">选择月份...</option>
+                                <option value="2026-02">2026年2月</option>
+                                <option value="2026-03">2026年3月</option>
+                            </select>
+                            <button class="generate-btn" onclick="app.generateMonthlyReport()">🔄 生成本月月报</button>
+                        </div>
+                        <div class="report-card" id="monthly-content">
+                            <div class="report-empty">
+                                <span class="empty-icon">📝</span>
+                                <p>选择月份或点击生成按钮查看月报</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 经济法学习全屏界面 -->
+    <div class="fullscreen-modal" id="econlaw-study-modal" style="display: none;">
+        <div class="fullscreen-header">
+            <button class="back-btn" onclick="app.closeEconLawStudy()">‹ 返回</button>
+            <span class="fullscreen-title" id="econlaw-study-module">经济法学习</span>
+            <span></span>
+        </div>
+        <div class="fullscreen-content" id="econlaw-study-content">
+            <!-- 动态生成 -->
+        </div>
+    </div>
+
+    <!-- 视频详情弹窗 -->
+    <div class="modal" id="video-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="app.closeVideoModal()">×</button>
+            <div class="modal-body" id="video-modal-body">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 词汇导入弹窗 -->
+    <div class="modal" id="import-modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="app.closeImportModal()">×</button>
+            <div class="modal-body">
+                <h2>📥 导入词汇库</h2>
+                <p class="import-desc">支持 JSON、CSV、TXT 格式，可导入中级、高级词汇或词组搭配</p>
+                
+                <div class="import-form">
+                    <div class="form-group">
+                        <label>选择文件</label>
+                        <input type="file" id="vocab-file-input" accept=".json,.csv,.txt" onchange="app.previewVocabularyFile()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>词汇等级</label>
+                        <select id="import-level">
+                            <option value="basic">基础词汇</option>
+                            <option value="intermediate">中级词汇</option>
+                            <option value="advanced">高级词汇</option>
+                            <option value="phrase">词组搭配</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>分组编号</label>
+                        <input type="number" id="import-group" value="1" min="1" placeholder="如：1、2、3...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>格式说明</label>
+                        <div class="format-examples">
+                            <details>
+                                <summary>JSON 格式示例</summary>
+                                <pre>[{"word": "example", "phonetic": "/ɪɡˈzæmpl/", "meaning": "n. 例子"}]</pre>
+                            </details>
+                            <details>
+                                <summary>CSV 格式示例</summary>
+                                <pre>word,phonetic,meaning
+example,/ɪɡˈzæmpl/,n. 例子</pre>
+                            </details>
+                            <details>
+                                <summary>TXT 格式示例</summary>
+                                <pre>example | /ɪɡˈzæmpl/ | n. 例子</pre>
+                            </details>
+                        </div>
+                    </div>
+                    
+                    <div class="import-preview" id="import-preview" style="display: none;">
+                        <h4>预览</h4>
+                        <p id="preview-stats"></p>
+                        <div class="preview-list" id="preview-list"></div>
+                    </div>
+                    
+                    <button class="save-daily-btn" onclick="app.importVocabulary()">确认导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学习完成提示 -->
+    <div class="toast" id="toast" style="display: none;">
+        <span class="toast-icon">🎉</span>
+        <span class="toast-message" id="toast-message"></span>
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div class="modal" id="login-modal" style="display: none;">
+        <div class="modal-content login-modal-content">
+            <button class="modal-close" onclick="loginUI.closeModal()">×</button>
+            <div class="login-body">
+                <div class="login-header">
+                    <span class="login-icon">🔐</span>
+                    <h2>用户登录</h2>
+                    <p>登录后可同步学习进度和设置</p>
+                </div>
+                
+                <div id="login-form-section">
+                    <div class="login-tabs">
+                        <button class="login-tab active" data-tab="login" onclick="loginUI.switchTab('login')">登录</button>
+                        <button class="login-tab" data-tab="register" onclick="loginUI.switchTab('register')">注册</button>
+                    </div>
+                    
+                    <form class="login-form" id="login-form" onsubmit="loginUI.handleLogin(event)">
+                        <div class="form-group">
+                            <label>用户名</label>
+                            <input type="text" id="login-username" placeholder="请输入用户名" required>
+                        </div>
+                        <div class="form-group">
+                            <label>密码</label>
+                            <input type="password" id="login-password" placeholder="请输入密码" required>
+                        </div>
+                        <button type="submit" class="login-submit-btn">登录</button>
+                    </form>
+                    
+                    <form class="login-form" id="register-form" style="display: none;" onsubmit="loginUI.handleRegister(event)">
+                        <div class="form-group">
+                            <label>用户名</label>
+                            <input type="text" id="register-username" placeholder="请输入用户名（6-20位）" required minlength="6" maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label>密码</label>
+                            <input type="password" id="register-password" placeholder="请输入密码（6-20位）" required minlength="6" maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label>确认密码</label>
+                            <input type="password" id="register-confirm" placeholder="请再次输入密码" required>
+                        </div>
+                        <button type="submit" class="login-submit-btn">注册</button>
+                    </form>
+                </div>
+                
+                <div id="user-profile-section" style="display: none;">
+                    <div class="user-profile">
+                        <div class="profile-avatar">👤</div>
+                        <div class="profile-info">
+                            <h3 id="profile-username">用户名</h3>
+                            <p id="profile-joined">注册时间：--</p>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <span class="stat-value" id="profile-study-days">0</span>
+                            <span class="stat-label">学习天数</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-value" id="profile-total-time">0</span>
+                            <span class="stat-label">学习时长(分)</span>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="profile-btn secondary" onclick="loginUI.switchAccount()">切换账号</button>
+                        <button class="profile-btn danger" onclick="loginUI.logout()">退出登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js?v=2"></script>
+    <script src="econLawData.js?v=2"></script>
+    <script src="vocabularyData.js?v=4"></script>
+    <script src="noteAndRestore.js?v=2"></script>
+    <script src="app.js?v=4"></script>
+    <script src="econLawApp.js?v=2"></script>
+    
+    <!-- 登录功能模块 -->
+    <script>
+    // ===== StudyX 登录系统 =====
+    const loginSystem = {
+        // 当前登录用户
+        currentUser: null,
+        
+        // 从 localStorage 加载登录状态
+        init() {
+            const saved = localStorage.getItem('studyx_current_user');
+            if (saved) {
+                this.currentUser = JSON.parse(saved);
+                this.updateUI();
+            }
+        },
+        
+        // 登录
+        login(username, password) {
+            const users = this._getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                this.currentUser = {
+                    username: user.username,
+                    joined: user.joined,
+                    lastLogin: new Date().toISOString()
+                };
+                localStorage.setItem('studyx_current_user', JSON.stringify(this.currentUser));
+                this.updateUI();
+                return { success: true };
+            }
+            return { success: false, error: '用户名或密码错误' };
+        },
+        
+        // 注册
+        register(username, password) {
+            const users = this._getUsers();
+            
+            if (users.find(u => u.username === username)) {
+                return { success: false, error: '用户名已存在' };
+            }
+            
+            const newUser = {
+                username,
+                password,
+                joined: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('studyx_users', JSON.stringify(users));
+            
+            // 自动登录
+            return this.login(username, password);
+        },
+        
+        // 登出
+        logout() {
+            this.currentUser = null;
+            localStorage.removeItem('studyx_current_user');
+            this.updateUI();
+        },
+        
+        // 更新界面
+        updateUI() {
+            const userInfo = document.getElementById('user-info');
+            const welcomeText = document.getElementById('welcome-text');
+            const avatar = document.getElementById('user-avatar');
+            
+            if (this.currentUser) {
+                welcomeText.textContent = `你好，${this.currentUser.username} 💪`;
+                avatar.textContent = '😊';
+                if (userInfo) userInfo.classList.add('logged-in');
+            } else {
+                welcomeText.textContent = '你好，备考人 💪';
+                avatar.textContent = '👤';
+                if (userInfo) userInfo.classList.remove('logged-in');
+            }
+        },
+        
+        // 获取用户列表
+        _getUsers() {
+            const saved = localStorage.getItem('studyx_users');
+            return saved ? JSON.parse(saved) : [];
+        }
+    };
+    
+    // ===== 登录界面交互 =====
+    const loginUI = {
+        showModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                this._updateProfileView();
+            }
+        },
+        
+        closeModal() {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        },
+        
+        switchTab(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.login-tab[data-tab="${tab}"]`).classList.add('active');
+            
+            if (tab === 'login') {
+                document.getElementById('login-form').style.display = 'block';
+                document.getElementById('register-form').style.display = 'none';
+            } else {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('register-form').style.display = 'block';
+            }
+        },
+        
+        handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            const result = loginSystem.login(username, password);
+            if (result.success) {
+                this._showMessage('登录成功！', 'success');
+                this._updateProfileView();
+            } else {
+                this._showMessage(result.error, 'error');
+            }
+        },
+        
+        handleRegister(event) {
+            event.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            
+            if (password !== confirm) {
+                this._showMessage('两次输入的密码不一致', 'error');
+                return;
+            }
+            
+            const result = loginSystem.register(username, password);
+            if (result.success) {
+                this._showMessage('注册成功，已自动登录！', 'success');
+                this._updateProfileView();
+            } else {
+                this._showMessage(result.error, 'error');
+            }
+        },
+        
+        logout() {
+            if (confirm('确定要退出登录吗？')) {
+                loginSystem.logout();
+                this.switchTab('login');
+                this._updateProfileView();
+                this._showMessage('已退出登录', 'info');
+            }
+        },
+        
+        switchAccount() {
+            loginSystem.logout();
+            this.switchTab('login');
+            this._updateProfileView();
+        },
+        
+        _updateProfileView() {
+            const isLoggedIn = !!loginSystem.currentUser;
+            document.getElementById('login-form-section').style.display = isLoggedIn ? 'none' : 'block';
+            document.getElementById('user-profile-section').style.display = isLoggedIn ? 'block' : 'none';
+            
+            if (isLoggedIn) {
+                const user = loginSystem.currentUser;
+                document.getElementById('profile-username').textContent = user.username;
+                document.getElementById('profile-joined').textContent = `注册时间：${new Date(user.joined).toLocaleDateString('zh-CN')}`;
+                
+                // 统计学习数据
+                const reportCount = Object.keys(userData.dailyReports || {}).length;
+                document.getElementById('profile-study-days').textContent = reportCount;
+                document.getElementById('profile-total-time').textContent = userData.todayStudyTime || 0;
+                
+                // 更新手机端显示
+                const mobileWelcome = document.getElementById('welcome-text-mobile');
+                if (mobileWelcome) mobileWelcome.textContent = user.username;
+            } else {
+                // 未登录状态
+                const mobileWelcome = document.getElementById('welcome-text-mobile');
+                if (mobileWelcome) mobileWelcome.textContent = '登录/注册';
+            }
+        },
+        
+        _showMessage(message, type) {
+            // 使用应用的 toast 或 alert
+            if (typeof app !== 'undefined' && app.showToast) {
+                app.showToast(message);
+            } else {
+                alert(message);
+            }
+        }
+    };
+    
+    // 初始化登录系统
+    document.addEventListener('DOMContentLoaded', () => {
+        loginSystem.init();
+    });
+    
+    // 导出到全局
+    window.loginSystem = loginSystem;
+    window.loginUI = loginUI;
+    </script>
+    
+    <!-- 测试备份模块加载 -->
+    <script>
+        console.log('[Init] 页面加载完成');
+        console.log('[Init] backupRestoreUI:', typeof window.backupRestoreUI);
+        console.log('[Init] userData:', typeof userData);
+        
+        // 确保备份模块初始化
+        if (window.backupRestoreUI) {
+            console.log('[Init] 初始化备份模块...');
+            backupRestoreUI.init();
+        } else {
+            console.error('[Init] 备份模块未加载！');
+        }
+    </script>
+    
+    <!-- 版本号显示 -->
+    <div class="app-version" style="position: fixed; bottom: 60px; right: 10px; font-size: 11px; color: var(--text-secondary); opacity: 0.6; z-index: 100;">v1.0.2</div>
+</body>
+</html>

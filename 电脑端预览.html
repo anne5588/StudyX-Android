@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>StudyX 电脑端预览</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .preview-header {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-header p {
+            color: #888;
+            font-size: 14px;
+        }
+        
+        .device-selector {
+            margin-bottom: 20px;
+        }
+        
+        .device-selector select {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: #2d2d44;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .device-frame {
+            background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+        
+        .device-screen {
+            background: #0f172a;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .device-screen iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        
+        /* iPhone 14 Pro */
+        .iphone-14-pro {
+            width: 393px;
+            height: 852px;
+        }
+        
+        .iphone-14-pro .device-screen {
+            width: 393px;
+            height: 852px;
+        }
+        
+        /* iPhone SE */
+        .iphone-se {
+            width: 375px;
+            height: 667px;
+        }
+        
+        .iphone-se .device-screen {
+            width: 375px;
+            height: 667px;
+        }
+        
+        /* Android */
+        .android-default {
+            width: 360px;
+            height: 800px;
+        }
+        
+        .android-default .device-screen {
+            width: 360px;
+            height: 800px;
+        }
+        
+        /* iPad Mini */
+        .ipad-mini {
+            width: 768px;
+            height: 1024px;
+        }
+        
+        .ipad-mini .device-screen {
+            width: 768px;
+            height: 1024px;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            background: #6366f1;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: #4f46e5;
+        }
+        
+        .btn.secondary {
+            background: #334155;
+        }
+        
+        .btn.secondary:hover {
+            background: #475569;
+        }
+        
+        .tips {
+            margin-top: 20px;
+            padding: 20px;
+            background: #2d2d44;
+            border-radius: 12px;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.8;
+            max-width: 800px;
+        }
+        
+        .tips h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .tips ul {
+            padding-left: 20px;
+        }
+        
+        .tips li {
+            margin-bottom: 5px;
+        }
+        
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+        
+        @media (max-width: 900px) {
+            .device-frame {
+                transform: scale(0.7);
+                transform-origin: top center;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .device-frame {
+                transform: scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-header">
+        <h1>📱 StudyX 电脑端预览</h1>
+        <p>在浏览器中模拟手机界面，快速测试APP效果</p>
+    </div>
+    
+    <div class="device-selector">
+        <select id="deviceSelect" onchange="changeDevice()">
+            <option value="iphone-14-pro">iPhone 14 Pro (推荐)</option>
+            <option value="iphone-se">iPhone SE</option>
+            <option value="android-default">Android 默认</option>
+            <option value="ipad-mini">iPad Mini</option>
+        </select>
+    </div>
+    
+    <div class="device-frame iphone-14-pro" id="deviceFrame">
+        <div class="device-screen">
+            <div class="notch"></div>
+            <iframe id="previewFrame" src="app/src/main/assets/www/index.html"></iframe>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" onclick="refreshPreview()">🔄 刷新</button>
+        <button class="btn secondary" onclick="rotateDevice()">↻ 旋转</button>
+        <button class="btn secondary" onclick="toggleFullscreen()">⛶ 全屏</button>
+    </div>
+    
+    <div class="tips">
+        <h3>💡 使用提示</h3>
+        <ul>
+            <li><strong>刷新页面：</strong>修改代码后点击刷新按钮查看效果</li>
+            <li><strong>模拟触摸：</strong>用鼠标点击代替手指触摸</li>
+            <li><strong>开发者工具：</strong>按 F12 可调试 JavaScript</li>
+            <li><strong>旋转屏幕：</strong>点击旋转按钮切换横竖屏</li>
+            <li><strong>局限性：</strong>无法测试语音播放等原生功能</li>
+        </ul>
+    </div>
+    
+    <script>
+        let isLandscape = false;
+        let isFullscreen = false;
+        
+        function changeDevice() {
+            const device = document.getElementById('deviceSelect').value;
+            const frame = document.getElementById('deviceFrame');
+            
+            // 移除所有设备类
+            frame.classList.remove('iphone-14-pro', 'iphone-se', 'android-default', 'ipad-mini');
+            
+            // 添加新设备类
+            frame.classList.add(device);
+            
+            // 重置方向
+            isLandscape = false;
+        }
+        
+        function refreshPreview() {
+            const iframe = document.getElementById('previewFrame');
+            iframe.src = iframe.src;
+        }
+        
+        function rotateDevice() {
+            const frame = document.getElementById('deviceFrame');
+            const screen = frame.querySelector('.device-screen');
+            const iframe = document.getElementById('previewFrame');
+            
+            isLandscape = !isLandscape;
+            
+            if (isLandscape) {
+                // 交换宽高
+                const width = screen.style.width || getComputedStyle(screen).width;
+                const height = screen.style.height || getComputedStyle(screen).height;
+                screen.style.width = height;
+                screen.style.height = width;
+                iframe.style.width = height;
+                iframe.style.height = width;
+            } else {
+                screen.style.width = '';
+                screen.style.height = '';
+                iframe.style.width = '';
+                iframe.style.height = '';
+            }
+        }
+        
+        function toggleFullscreen() {
+            const frame = document.getElementById('deviceFrame');
+            
+            if (!isFullscreen) {
+                frame.style.position = 'fixed';
+                frame.style.top = '50%';
+                frame.style.left = '50%';
+                frame.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                frame.style.zIndex = '9999';
+                document.body.style.background = '#000';
+            } else {
+                frame.style.position = '';
+                frame.style.top = '';
+                frame.style.left = '';
+                frame.style.transform = '';
+                frame.style.zIndex = '';
+                document.body.style.background = '';
+            }
+            
+            isFullscreen = !isFullscreen;
+        }
+        
+        // 自动刷新（每5秒检查文件变化）
+        setInterval(() => {
+            // 这里可以实现文件变化检测
+            // 目前需要手动刷新
+        }, 5000);
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F5' || (e.key === 'r' && e.ctrlKey)) {
+                e.preventDefault();
+                refreshPreview();
+            }
+        });
+    </script>
+</body>
+</html>
