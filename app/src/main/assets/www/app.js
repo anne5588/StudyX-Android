@@ -3757,13 +3757,13 @@ const app = {
     },
 
     validateReadingArticle(article) {
-        // 验证文章格式是否正确
+        // 验证文章格式是否正确（允许中文翻译为空）
         return article && 
                article.year && 
                article.title && 
                Array.isArray(article.sentences) &&
                article.sentences.length > 0 &&
-               article.sentences.every(s => s.en && s.zh);
+               article.sentences.every(s => s.en && s.en.trim() !== '');
     },
 
     exportReadingPapers() {
