@@ -3403,8 +3403,9 @@ const app = {
     },
 
     formatCalcContent(content) {
-        // 将换行符转换为HTML，并保留公式格式
+        // 将换行符转换为HTML，合并多个换行符，保留公式格式
         return content
+            .replace(/\n{3,}/g, '\n\n')  // 3个及以上换行符合并为2个
             .replace(/\n/g, '<br>')
             .replace(/（(\d+)）/g, '<strong>（$1）</strong>')
             .replace(/\^(\d+)/g, '<sup>$1</sup>')
