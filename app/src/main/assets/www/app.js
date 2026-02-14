@@ -3460,9 +3460,14 @@ const app = {
     // ========== 英语阅读理解页面 ==========
     readingPapers: [],
     currentReadingFilter: 'all',
+    currentReadingIndex: null,
+    showAllTranslation: false,
 
     initReading() {
         this.loadReadingPapers();
+        if (this.readingPapers.length === 0) {
+            this.loadDefaultReadingPapers();
+        }
         this.renderReadingPapers();
     },
 
@@ -3472,6 +3477,70 @@ const app = {
         if (saved) {
             this.readingPapers = JSON.parse(saved);
         }
+    },
+
+    loadDefaultReadingPapers() {
+        // 加载示例英语阅读文章
+        this.readingPapers = [
+            {
+                id: 1,
+                year: '2024',
+                title: 'The Impact of Technology on Education',
+                source: '2024年申硕英语真题 Passage 1',
+                sentences: [
+                    { en: 'Technology has transformed the way we learn and teach in the 21st century.', zh: '科技已经改变了21世纪我们学习和教学的方式。' },
+                    { en: 'Online platforms allow students to access educational resources from anywhere in the world.', zh: '在线平台让学生可以从世界任何地方获取教育资源。' },
+                    { en: 'However, some experts argue that excessive screen time may affect students\' physical health.', zh: '然而，一些专家认为过度的屏幕时间可能会影响学生的身体健康。' },
+                    { en: 'Therefore, it is important to find a balance between digital learning and traditional methods.', zh: '因此，在数字化学习和传统方法之间找到平衡是很重要的。' },
+                    { en: 'Teachers should integrate technology wisely to enhance rather than replace human interaction.', zh: '教师应该明智地整合科技，以增强而不是取代人际互动。' },
+                    { en: 'Ultimately, the goal of education remains the same: to cultivate critical thinking and creativity.', zh: '最终，教育的目标仍然相同：培养批判性思维和创造力。' }
+                ],
+                questions: [
+                    { q: 'What is the main idea of this passage?', options: ['A. Technology is harmful', 'B. Technology changes education', 'C. Traditional methods are better', 'D. Students need less screen time'], answer: 'B' }
+                ],
+                favorite: false,
+                completed: false
+            },
+            {
+                id: 2,
+                year: '2023',
+                title: 'Climate Change and Our Responsibility',
+                source: '2023年申硕英语真题 Passage 2',
+                sentences: [
+                    { en: 'Climate change is one of the most pressing challenges facing humanity today.', zh: '气候变化是当今人类面临的最紧迫挑战之一。' },
+                    { en: 'Rising global temperatures have led to melting ice caps and rising sea levels.', zh: '全球气温上升导致冰盖融化和海平面上升。' },
+                    { en: 'Many island nations are particularly vulnerable to these environmental changes.', zh: '许多岛国特别容易受到这些环境变化的影响。' },
+                    { en: 'Governments around the world have pledged to reduce carbon emissions by 2050.', zh: '世界各国政府已承诺到2050年减少碳排放。' },
+                    { en: 'But individual actions also matter significantly in addressing this global crisis.', zh: '但个人行动在应对这一全球危机方面也非常重要。' },
+                    { en: 'Simple steps like reducing waste and conserving energy can make a real difference.', zh: '像减少浪费和节约能源这样的简单步骤可以产生真正的影响。' }
+                ],
+                questions: [
+                    { q: 'According to the passage, who is responsible for fighting climate change?', options: ['A. Only governments', 'B. Only individuals', 'C. Both governments and individuals', 'D. Only scientists'], answer: 'C' }
+                ],
+                favorite: false,
+                completed: false
+            },
+            {
+                id: 3,
+                year: '2022',
+                title: 'The Art of Time Management',
+                source: '2022年申硕英语真题 Passage 1',
+                sentences: [
+                    { en: 'In our fast-paced modern world, time management has become an essential skill.', zh: '在我们快节奏的现代世界中，时间管理已成为一项必备技能。' },
+                    { en: 'Successful people often attribute their achievements to effective planning and prioritization.', zh: '成功人士经常将他们的成就归功于有效的规划和优先排序。' },
+                    { en: 'The Pomodoro Technique, which involves working in focused intervals, has gained popularity.', zh: '番茄工作法涉及在专注的间隔时间内工作，已经广受欢迎。' },
+                    { en: 'This method suggests working for 25 minutes and then taking a 5-minute break.', zh: '这个方法建议工作25分钟，然后休息5分钟。' },
+                    { en: 'Regular breaks help maintain concentration and prevent mental fatigue.', zh: '定期休息有助于保持注意力并防止精神疲劳。' },
+                    { en: 'Remember that managing time well means having more time for what truly matters in life.', zh: '记住，管理好时间意味着有更多时间去做生活中真正重要的事情。' }
+                ],
+                questions: [
+                    { q: 'What is the Pomodoro Technique mentioned in the passage?', options: ['A. A time management method', 'B. A cooking technique', 'C. An exercise program', 'D. A meditation practice'], answer: 'A' }
+                ],
+                favorite: false,
+                completed: false
+            }
+        ];
+        this.saveReadingPapers();
     },
 
     saveReadingPapers() {
@@ -3495,64 +3564,130 @@ const app = {
             container.innerHTML = `
                 <div class="reading-empty">
                     <span class="empty-icon">📖</span>
-                    <p>暂无英语试卷</p>
-                    <p class="empty-tip">支持导入13-25年申硕英语真题（含阅读理解、答案、解析）</p>
-                    <button onclick="app.showImportReadingModal()">导入试卷</button>
+                    <p>暂无英语文章</p>
+                    <p class="empty-tip">支持导入13-25年申硕英语真题</p>
+                    <button onclick="app.showImportReadingModal()">导入文章</button>
                 </div>
             `;
             return;
         }
 
         container.innerHTML = papers.map((p, index) => `
-            <div class="reading-paper-item" onclick="app.openReadingPaper(${index})">
+            <div class="reading-paper-item" onclick="app.openReadingDetail(${index})">
                 <div class="reading-paper-header">
                     <span class="reading-paper-year">${p.year}年</span>
-                    <span class="reading-paper-status ${p.completed ? 'done' : 'unread'}">${p.completed ? '✓ 已做' : '未做'}</span>
+                    <span class="reading-paper-status ${p.completed ? 'completed' : ''}">${p.completed ? '✅' : p.favorite ? '❤️' : '📖'}</span>
                 </div>
                 <div class="reading-paper-title">${p.title}</div>
-                <div class="reading-paper-desc">${p.desc || '申硕英语阅读理解真题'}</div>
+                <div class="reading-paper-desc">${p.source || '申硕英语阅读理解'}</div>
                 <div class="reading-paper-meta">
-                    <span>📌 ${p.articles || 4}篇阅读</span>
-                    <span>🕐 约${p.time || 60}分钟</span>
-                    <span>📝 ${p.questions || 20}道题</span>
+                    <span>📄 ${p.sentences ? p.sentences.length : 0}句</span>
+                    <span>❓ ${p.questions ? p.questions.length : 0}题</span>
+                    ${p.completed ? '<span style="color:var(--success)">已完成</span>' : ''}
                 </div>
             </div>
         `).join('');
     },
 
-    showAddReadingModal() {
-        // 新建英语试卷
-        const year = prompt('请输入年份（如2025）:');
-        if (year && year.trim()) {
-            const title = prompt('请输入试卷标题:');
-            if (title && title.trim()) {
-                this.readingPapers.push({
-                    year: year.trim(),
-                    title: title.trim(),
-                    desc: '申硕英语阅读理解',
-                    articles: 4,
-                    questions: 20,
-                    time: 60,
-                    completed: false,
-                    date: new Date().toLocaleDateString('zh-CN'),
-                    id: Date.now()
-                });
-                this.saveReadingPapers();
-                this.renderReadingPapers();
-                this.showToast('✅ 试卷已添加');
-            }
+    setReadingFilter(year) {
+        this.currentReadingFilter = year;
+        document.querySelectorAll('.reading-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            const btnYear = btn.getAttribute('onclick').match(/'(\w+)'/)?.[1];
+            if (btnYear === year) btn.classList.add('active');
+        });
+        this.renderReadingPapers();
+    },
+
+    openReadingDetail(index) {
+        this.currentReadingIndex = index;
+        const paper = this.readingPapers[index];
+        
+        document.getElementById('page-reading').style.display = 'none';
+        document.getElementById('page-reading-detail').style.display = 'block';
+        
+        const contentDiv = document.getElementById('reading-detail-content');
+        contentDiv.innerHTML = `
+            <div class="reading-article-title">${paper.title}</div>
+            <div class="reading-article-source">${paper.source}</div>
+            ${paper.sentences.map((s, i) => `
+                <div class="reading-sentence" id="sentence-${i}" onclick="app.toggleSentenceTranslation(${i})">
+                    <div class="reading-english">
+                        <span class="reading-sentence-number">${i + 1}</span>
+                        ${s.en}
+                    </div>
+                    <div class="reading-chinese" id="translation-${i}" style="display: ${this.showAllTranslation ? 'block' : 'none'}">
+                        ${s.zh}
+                    </div>
+                </div>
+            `).join('')}
+        `;
+        
+        document.getElementById('reading-progress-text').textContent = `${paper.sentences.length}句`;
+        
+        const favBtn = document.getElementById('reading-fav-btn');
+        favBtn.textContent = paper.favorite ? '❤️' : '🤍';
+        favBtn.classList.toggle('active', paper.favorite);
+    },
+
+    closeReadingDetail() {
+        document.getElementById('page-reading-detail').style.display = 'none';
+        document.getElementById('page-reading').style.display = 'block';
+        this.currentReadingIndex = null;
+        this.showAllTranslation = false;
+    },
+
+    toggleSentenceTranslation(index) {
+        const translationDiv = document.getElementById(`translation-${index}`);
+        const sentenceDiv = document.getElementById(`sentence-${index}`);
+        
+        if (translationDiv.style.display === 'none') {
+            translationDiv.style.display = 'block';
+            sentenceDiv.classList.add('active');
+        } else {
+            translationDiv.style.display = 'none';
+            sentenceDiv.classList.remove('active');
         }
     },
 
-    openReadingPaper(index) {
-        const p = this.readingPapers[index];
-        // 打开试卷详情（简化版）
-        const doIt = confirm(`试卷：${p.title}\n\n是否开始练习？`);
-        if (doIt) {
-            p.completed = true;
+    toggleAllTranslation() {
+        this.showAllTranslation = !this.showAllTranslation;
+        const paper = this.readingPapers[this.currentReadingIndex];
+        if (paper) {
+            paper.sentences.forEach((_, i) => {
+                const translationDiv = document.getElementById(`translation-${i}`);
+                const sentenceDiv = document.getElementById(`sentence-${i}`);
+                if (translationDiv) {
+                    translationDiv.style.display = this.showAllTranslation ? 'block' : 'none';
+                    sentenceDiv.classList.toggle('active', this.showAllTranslation);
+                }
+            });
+        }
+    },
+
+    toggleReadingFavorite() {
+        const paper = this.readingPapers[this.currentReadingIndex];
+        if (paper) {
+            paper.favorite = !paper.favorite;
             this.saveReadingPapers();
-            this.renderReadingPapers();
-            this.showToast('📖 开始练习！');
+            
+            const favBtn = document.getElementById('reading-fav-btn');
+            favBtn.textContent = paper.favorite ? '❤️' : '🤍';
+            favBtn.classList.toggle('active', paper.favorite);
+        }
+    },
+
+    startReadingQuiz() {
+        const paper = this.readingPapers[this.currentReadingIndex];
+        if (paper && paper.questions && paper.questions.length > 0) {
+            paper.completed = true;
+            this.saveReadingPapers();
+            
+            const q = paper.questions[0];
+            let optionsHtml = q.options.map((opt) => `<div style="padding:6px 0;">${opt}</div>`).join('');
+            alert(`题目：${q.q}\n\n${optionsHtml}\n\n答案：${q.answer}`);
+        } else {
+            alert('暂无题目');
         }
     },
 

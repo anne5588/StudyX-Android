@@ -878,31 +878,47 @@
                 <div class="page" id="page-reading">
                     <div class="reading-header">
                         <h2>📖 英语阅读理解</h2>
-                        <p>历年申硕英语真题，支持导入/导出试卷</p>
+                        <p>AI点读翻译，点击英文显示中文</p>
                         <div class="reading-actions">
-                            <button class="reading-action-btn" onclick="app.showImportReadingModal()">📤 导入试卷</button>
-                            <button class="reading-action-btn" onclick="app.showAddReadingModal()">➕ 新建试卷</button>
-                            <button class="reading-action-btn" onclick="app.exportReadingPapers()">📥 导出试卷</button>
+                            <button class="reading-action-btn" onclick="app.showImportReadingModal()">
+                                <span class="icon">📤</span><span>导入</span>
+                            </button>
+                            <button class="reading-action-btn" onclick="app.toggleReadingMode()">
+                                <span class="icon">👁️</span><span>全译</span>
+                            </button>
                         </div>
                     </div>
 
                     <div class="reading-filter">
-                        <button class="reading-filter-btn active" data-year="all">全部年份</button>
-                        <button class="reading-filter-btn" data-year="2025">2025</button>
-                        <button class="reading-filter-btn" data-year="2024">2024</button>
-                        <button class="reading-filter-btn" data-year="2023">2023</button>
-                        <button class="reading-filter-btn" data-year="2022">2022</button>
-                        <button class="reading-filter-btn" data-year="older">更早</button>
+                        <button class="reading-filter-btn active" onclick="app.setReadingFilter('all')">全部</button>
+                        <button class="reading-filter-btn" onclick="app.setReadingFilter('2024')">2024</button>
+                        <button class="reading-filter-btn" onclick="app.setReadingFilter('2023')">2023</button>
+                        <button class="reading-filter-btn" onclick="app.setReadingFilter('2022')">2022</button>
+                        <button class="reading-filter-btn" onclick="app.setReadingFilter('older')">更早</button>
                     </div>
 
                     <div class="reading-paper-list" id="reading-paper-list">
-                        <!-- 英语试卷列表动态生成 -->
-                        <div class="reading-empty">
-                            <span class="empty-icon">📖</span>
-                            <p>暂无英语试卷</p>
-                            <p class="empty-tip">支持导入13-25年申硕英语真题</p>
-                            <button onclick="app.showImportReadingModal()">导入试卷</button>
+                        <!-- 英语文章列表动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 阅读详情页（点读模式） -->
+                <div class="page" id="page-reading-detail" style="display: none;">
+                    <div class="reading-detail-header">
+                        <button class="back-btn" onclick="app.closeReadingDetail()">← 返回</button>
+                        <div class="reading-progress">
+                            <span id="reading-progress-text">0/0</span>
                         </div>
+                        <button class="favorite-btn" onclick="app.toggleReadingFavorite()" id="reading-fav-btn">🤍</button>
+                    </div>
+                    
+                    <div class="reading-detail-content" id="reading-detail-content">
+                        <!-- 点读内容动态生成 -->
+                    </div>
+                    
+                    <div class="reading-detail-toolbar">
+                        <button onclick="app.toggleAllTranslation()">👁️ 显示/隐藏全文翻译</button>
+                        <button onclick="app.startReadingQuiz()">📝 开始做题</button>
                     </div>
                 </div>
             </div>
