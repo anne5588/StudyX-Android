@@ -6446,6 +6446,67 @@ body {
     color: var(--text-secondary);
 }
 
+/* 答案切换按钮 */
+.calc-answer-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border: 2px dashed var(--primary);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.calc-answer-toggle:hover {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-style: solid;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.calc-answer-toggle.active {
+    background: var(--bg-hover);
+    border-style: solid;
+    border-color: var(--text-muted);
+}
+
+.calc-answer-toggle .toggle-icon {
+    font-size: 18px;
+}
+
+.calc-answer-toggle .toggle-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-light);
+}
+
+.calc-answer-toggle:hover .toggle-text {
+    color: white;
+}
+
+.calc-answer-toggle.active .toggle-text {
+    color: var(--text-secondary);
+}
+
+.calc-answer-content {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* 移动端适配 */
 @media (max-width: 640px) {
     .calc-detail-content {
@@ -6462,6 +6523,14 @@ body {
     .calc-detail-section {
         padding: 16px;
         margin-bottom: 16px;
+    }
+    
+    .calc-answer-toggle {
+        padding: 12px 20px;
+    }
+    
+    .calc-answer-toggle .toggle-text {
+        font-size: 13px;
     }
 }
 

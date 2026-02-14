@@ -3277,24 +3277,53 @@ const app = {
         
         title.textContent = q.title;
         body.innerHTML = `
-            <div class="calc-detail-section">
+            <div class="calc-detail-section question-section">
                 <div class="calc-detail-type">${this.getCalcTypeName(q.type)} · ${q.year || ''}年真题</div>
                 <div class="calc-detail-content">${this.formatCalcContent(q.content)}</div>
             </div>
             
-            <div class="calc-detail-section answer-section">
-                <div class="calc-section-title">📝 参考答案</div>
-                <div class="calc-detail-content">${this.formatCalcContent(q.answer || '暂无答案')}</div>
+            <div class="calc-answer-toggle" onclick="app.toggleCalcAnswer(this)">
+                <span class="toggle-icon">👁️</span>
+                <span class="toggle-text">点击查看参考答案</span>
             </div>
             
-            <div class="calc-detail-section analysis-section">
-                <div class="calc-section-title">💡 解析点评</div>
-                <div class="calc-detail-content">${this.formatCalcContent(q.analysis || '暂无解析')}</div>
+            <div class="calc-answer-content" id="calc-answer-content" style="display: none;">
+                <div class="calc-detail-section answer-section">
+                    <div class="calc-section-title">📝 参考答案</div>
+                    <div class="calc-detail-content">${this.formatCalcContent(q.answer || '暂无答案')}</div>
+                </div>
+                
+                <div class="calc-detail-section analysis-section">
+                    <div class="calc-section-title">💡 解析点评</div>
+                    <div class="calc-detail-content">${this.formatCalcContent(q.analysis || '暂无解析')}</div>
+                </div>
             </div>
         `;
         
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    },
+
+    toggleCalcAnswer(btn) {
+        const content = document.getElementById('calc-answer-content');
+        const text = btn.querySelector('.toggle-text');
+        const icon = btn.querySelector('.toggle-icon');
+        
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            text.textContent = '点击隐藏参考答案';
+            icon.textContent = '🙈';
+            btn.classList.add('active');
+            // 滚动到答案区域
+            setTimeout(() => {
+                content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        } else {
+            content.style.display = 'none';
+            text.textContent = '点击查看参考答案';
+            icon.textContent = '👁️';
+            btn.classList.remove('active');
+        }
     },
 
     closeCalcDetailModal() {
