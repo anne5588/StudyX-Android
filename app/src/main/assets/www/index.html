@@ -857,11 +857,11 @@
                     </div>
 
                     <div class="calc-filter">
-                        <button class="calc-filter-btn active" data-type="all">全部</button>
-                        <button class="calc-filter-btn" data-type="micro">微观经济学</button>
-                        <button class="calc-filter-btn" data-type="macro">宏观经济学</button>
-                        <button class="calc-filter-btn" data-type="fiscal">财政学</button>
-                        <button class="calc-filter-btn" data-type="monetary">货币银行</button>
+                        <button class="calc-filter-btn active" onclick="app.setCalcFilter('all')">全部</button>
+                        <button class="calc-filter-btn" onclick="app.setCalcFilter('micro')">微观</button>
+                        <button class="calc-filter-btn" onclick="app.setCalcFilter('macro')">宏观</button>
+                        <button class="calc-filter-btn" onclick="app.setCalcFilter('fiscal')">财政</button>
+                        <button class="calc-filter-btn" onclick="app.setCalcFilter('monetary')">货币</button>
                     </div>
 
                     <div class="calc-question-list" id="calc-question-list">

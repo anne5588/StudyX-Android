@@ -6412,6 +6412,8 @@ body {
     background: var(--bg-card);
     border-radius: var(--radius-xl);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .calc-detail-body {
@@ -6582,16 +6584,50 @@ body {
 }
 
 /* 移动端适配 */
+/* 移动端适配 - 底部全屏卡片 */
 @media (max-width: 640px) {
+    #calc-detail-modal {
+        align-items: flex-end;
+        padding: 0;
+    }
+    
+    #calc-detail-modal .modal-header {
+        border-radius: 20px 20px 0 0;
+        padding: 16px 20px;
+        position: sticky;
+        top: 0;
+        background: var(--bg-card);
+        z-index: 10;
+    }
+    
+    #calc-detail-modal .modal-close {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--bg-hover);
+    }
+    
     .calc-detail-content {
-        width: 95%;
-        max-height: 90vh;
-        border-radius: var(--radius-lg);
+        width: 100%;
+        max-width: 100%;
+        max-height: 92vh;
+        height: 92vh;
+        border-radius: 20px 20px 0 0;
+        animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
     }
     
     .calc-detail-body {
-        padding: 16px;
-        max-height: calc(90vh - 70px);
+        padding: 16px 20px;
+        max-height: calc(92vh - 60px);
+        padding-bottom: 100px;
     }
     
     .calc-detail-section {
@@ -6599,12 +6635,18 @@ body {
         margin-bottom: 16px;
     }
     
+    .calc-detail-type {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+    
     .calc-answer-toggle {
-        padding: 12px 20px;
+        padding: 14px 20px;
+        margin-bottom: 16px;
     }
     
     .calc-answer-toggle .toggle-text {
-        font-size: 13px;
+        font-size: 14px;
     }
     
     .calc-detail-header-row {
@@ -6614,14 +6656,16 @@ body {
     
     .calc-mastery-selector {
         width: 100%;
-        justify-content: flex-start;
+        justify-content: space-between;
     }
     
     .calc-mastery-btn {
         flex: 1;
         justify-content: center;
-        padding: 8px;
+        padding: 8px 4px;
+        font-size: 12px;
     }
+}
 
 /* ===== 英语阅读理解页面 ===== */
 .reading-header {

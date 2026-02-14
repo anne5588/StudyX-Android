@@ -2963,6 +2963,18 @@ const app = {
         this.initCalcModalEvents();
     },
 
+    setCalcFilter(type) {
+        this.currentCalcFilter = type;
+        // 更新按钮样式
+        document.querySelectorAll('.calc-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('onclick').includes(`'${type}'`)) {
+                btn.classList.add('active');
+            }
+        });
+        this.renderCalcQuestions();
+    },
+
     loadCalcQuestions() {
         // 从localStorage加载计算题
         const saved = localStorage.getItem('studyx_calc_questions');
