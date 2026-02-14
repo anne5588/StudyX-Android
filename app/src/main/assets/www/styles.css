@@ -6423,14 +6423,19 @@ body {
 }
 
 .calc-detail-section {
-    margin-bottom: 24px;
-    padding: 20px;
+    margin-bottom: 16px;
+    padding: 16px;
     background: var(--bg-secondary);
     border-radius: var(--radius-lg);
 }
 
 .calc-detail-section:last-child {
     margin-bottom: 0;
+}
+
+/* 题目区域不设置固定高度，根据内容自适应 */
+.calc-detail-section.question-section {
+    min-height: auto;
 }
 
 .calc-detail-header-row {
@@ -6625,13 +6630,13 @@ body {
     }
     
     .calc-detail-body {
-        padding: 12px 16px;
-        max-height: calc(100vh - 52px);
+        padding: 10px 12px;
+        max-height: calc(100vh - 50px);
     }
     
     .calc-detail-section {
-        padding: 12px;
-        margin-bottom: 12px;
+        padding: 10px;
+        margin-bottom: 10px;
         border-radius: var(--radius);
     }
     
@@ -6641,12 +6646,12 @@ body {
     }
     
     .calc-answer-toggle {
-        padding: 14px 20px;
-        margin-bottom: 16px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
     }
     
     .calc-answer-toggle .toggle-text {
-        font-size: 14px;
+        font-size: 13px;
     }
     
     .calc-detail-header-row {
