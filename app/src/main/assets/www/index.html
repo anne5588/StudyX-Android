@@ -983,6 +983,19 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
         </div>
     </div>
 
+    <!-- 计算题详情弹窗 -->
+    <div class="modal" id="calc-detail-modal" style="display: none;">
+        <div class="modal-content calc-detail-content">
+            <div class="modal-header">
+                <h3 id="calc-detail-title">题目详情</h3>
+                <button class="modal-close" onclick="app.closeCalcDetailModal()">×</button>
+            </div>
+            <div class="modal-body calc-detail-body" id="calc-detail-body">
+                <!-- 内容动态填充 -->
+            </div>
+        </div>
+    </div>
+
     <!-- 学习完成提示 -->
     <div class="toast" id="toast" style="display: none;">
         <span class="toast-icon">🎉</span>

@@ -6369,6 +6369,102 @@ body {
     cursor: pointer;
 }
 
+/* ===== 计算题详情弹窗 ===== */
+.calc-detail-content {
+    max-width: 700px;
+    width: 90%;
+    max-height: 85vh;
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.calc-detail-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(85vh - 80px);
+}
+
+.calc-detail-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+}
+
+.calc-detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.calc-detail-type {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+.calc-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--primary-light);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.answer-section .calc-section-title {
+    color: #10b981;
+}
+
+.analysis-section .calc-section-title {
+    color: #f59e0b;
+}
+
+.calc-detail-content .calc-detail-content-text,
+.calc-detail-body .calc-detail-content {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.calc-detail-content strong {
+    color: var(--primary-light);
+}
+
+.calc-detail-content sup {
+    font-size: 11px;
+    color: var(--primary);
+}
+
+.calc-detail-content sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+    .calc-detail-content {
+        width: 95%;
+        max-height: 90vh;
+        border-radius: var(--radius-lg);
+    }
+    
+    .calc-detail-body {
+        padding: 16px;
+        max-height: calc(90vh - 70px);
+    }
+    
+    .calc-detail-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+}
+
 /* ===== 英语阅读理解页面 ===== */
 .reading-header {
     margin-bottom: 20px;

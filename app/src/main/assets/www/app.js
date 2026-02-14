@@ -3268,7 +3268,49 @@ const app = {
 
     openCalcQuestion(index) {
         const q = this.calcQuestions[index];
-        alert(`题目：${q.title}\n\n${q.content}\n\n答案：${q.answer || '暂无'}\n\n解析：${q.analysis || '暂无'}`);
+        const modal = document.getElementById('calc-detail-modal');
+        const body = document.getElementById('calc-detail-body');
+        const title = document.getElementById('calc-detail-title');
+        
+        if (!modal || !body) return;
+        
+        title.textContent = q.title;
+        body.innerHTML = `
+            <div class="calc-detail-section">
+                <div class="calc-detail-type">${this.getCalcTypeName(q.type)} · ${q.year || ''}年真题</div>
+                <div class="calc-detail-content">${this.formatCalcContent(q.content)}</div>
+            </div>
+            
+            <div class="calc-detail-section answer-section">
+                <div class="calc-section-title">📝 参考答案</div>
+                <div class="calc-detail-content">${this.formatCalcContent(q.answer || '暂无答案')}</div>
+            </div>
+            
+            <div class="calc-detail-section analysis-section">
+                <div class="calc-section-title">💡 解析点评</div>
+                <div class="calc-detail-content">${this.formatCalcContent(q.analysis || '暂无解析')}</div>
+            </div>
+        `;
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    },
+
+    closeCalcDetailModal() {
+        const modal = document.getElementById('calc-detail-modal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    },
+
+    formatCalcContent(content) {
+        // 将换行符转换为HTML，并保留公式格式
+        return content
+            .replace(/\n/g, '<br>')
+            .replace(/（(\d+)）/g, '<strong>（$1）</strong>')
+            .replace(/\^(\d+)/g, '<sup>$1</sup>')
+            .replace(/_([^_]+)_/g, '<sub>$1</sub>');
     },
 
     showImportCalcModal() {
