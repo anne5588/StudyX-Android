@@ -11,10 +11,20 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.provider.OpenableColumns;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+
+// ML Kit 翻译
+import com.google.mlkit.common.model.DownloadConditions;
+import com.google.mlkit.nl.translate.TranslateLanguage;
+import com.google.mlkit.nl.translate.Translation;
+import com.google.mlkit.nl.translate.Translator;
+import com.google.mlkit.nl.translate.TranslatorOptions;
 
 import androidx.core.content.FileProvider;
 
@@ -31,6 +41,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -46,11 +57,39 @@ public class WebAppInterface implements OnInitListener {
     private TextToSpeech textToSpeech;
     private boolean ttsInitialized = false;
     
+    // ML Kit 翻译器（英语 -> 中文）
+    private Translator englishToChineseTranslator;
+    private boolean translatorInitialized = false;
+    private boolean translatorDownloading = false;
+    
+    // 文件选择回调
+    private String filePickerCallback = null;
+    private static final int FILE_PICKER_REQUEST_CODE = 1001;
+    
     public WebAppInterface(Activity activity) {
         this.activity = activity;
         this.context = activity.getApplicationContext();
         // 初始化TTS
         textToSpeech = new TextToSpeech(context, this);
+        // 初始化翻译器
+        initTranslator();
+    }
+    
+    /**
+     * 初始化 ML Kit 翻译器
+     */
+    private void initTranslator() {
+        try {
+            TranslatorOptions options = new TranslatorOptions.Builder()
+                    .setSourceLanguage(TranslateLanguage.ENGLISH)
+                    .setTargetLanguage(TranslateLanguage.CHINESE)
+                    .build();
+            englishToChineseTranslator = Translation.getClient(options);
+            translatorInitialized = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            translatorInitialized = false;
+        }
     }
     
     @Override
@@ -490,6 +529,332 @@ public class WebAppInterface implements OnInitListener {
         if (textToSpeech != null) {
             textToSpeech.stop();
             textToSpeech.shutdown();
+        }
+    }
+    
+    // ===== 读取 Assets 文件 =====
+    
+    /**
+     * 从 assets 目录读取文本文件
+     * @param filePath assets 中的文件路径，如 "www/data/english_reading_35_passages.json"
+     * @param callback JS回调函数名
+     */
+    @JavascriptInterface
+    public void readAssetFile(String filePath, String callback) {
+        try {
+            InputStream is = context.getAssets().open(filePath);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            String content = new String(buffer, StandardCharsets.UTF_8);
+            
+            // 转义后返回
+            String jsonResult = "{\"success\":true,\"content\":\"" + escapeJson(content) + "\"}";
+            runJsCallback(callback, jsonResult);
+        } catch (IOException e) {
+            String errorMsg = e.getMessage() != null ? e.getMessage() : "读取文件失败";
+            runJsCallback(callback, "{\"success\":false,\"error\":\"" + escapeJson(errorMsg) + "\"}");
+        }
+    }
+    
+    // ===== ML Kit 本地翻译 =====
+    
+    /**
+     * 检查翻译模型是否已下载
+     * @return 是否已下载
+     */
+    @JavascriptInterface
+    public boolean isTranslationModelDownloaded() {
+        return translatorInitialized && englishToChineseTranslator != null;
+    }
+    
+    /**
+     * 下载翻译模型
+     * @param callback JS回调函数名
+     */
+    @JavascriptInterface
+    public void downloadTranslationModel(String callback) {
+        if (!translatorInitialized || englishToChineseTranslator == null) {
+            runJsCallback(callback, "{\"success\":false,\"error\":\"翻译器未初始化\"}");
+            return;
+        }
+        
+        if (translatorDownloading) {
+            runJsCallback(callback, "{\"success\":false,\"error\":\"模型下载中，请稍候\"}");
+            return;
+        }
+        
+        translatorDownloading = true;
+        
+        DownloadConditions conditions = new DownloadConditions.Builder()
+                .requireWifi()
+                .build();
+        
+        englishToChineseTranslator.downloadModelIfNeeded(conditions)
+                .addOnSuccessListener(unused -> {
+                    translatorDownloading = false;
+                    runJsCallback(callback, "{\"success\":true,\"message\":\"模型下载完成\"}");
+                })
+                .addOnFailureListener(e -> {
+                    translatorDownloading = false;
+                    String errorMsg = e.getMessage() != null ? e.getMessage() : "未知错误";
+                    runJsCallback(callback, "{\"success\":false,\"error\":\"" + escapeJson(errorMsg) + "\"}");
+                });
+    }
+    
+    /**
+     * 翻译英文文本为中文（本地离线翻译）
+     * @param text 要翻译的英文
+     * @param callback JS回调函数名
+     */
+    @JavascriptInterface
+    public void translateEnglishToChinese(String text, String callback) {
+        if (!translatorInitialized || englishToChineseTranslator == null) {
+            runJsCallback(callback, "{\"success\":false,\"error\":\"翻译器未初始化\"}");
+            return;
+        }
+        
+        if (text == null || text.trim().isEmpty()) {
+            runJsCallback(callback, "{\"success\":false,\"error\":\"文本为空\"}");
+            return;
+        }
+        
+        englishToChineseTranslator.translate(text)
+                .addOnSuccessListener(translatedText -> {
+                    String result = "{\"success\":true,\"original\":\"" + escapeJson(text) + "\",\"translated\":\"" + escapeJson(translatedText) + "\"}";
+                    runJsCallback(callback, result);
+                })
+                .addOnFailureListener(e -> {
+                    String errorMsg = e.getMessage() != null ? e.getMessage() : "翻译失败";
+                    // 检查是否是模型未下载的错误
+                    if (errorMsg.toLowerCase().contains("model")) {
+                        errorMsg = "翻译模型未下载，请先调用 downloadTranslationModel()";
+                    }
+                    runJsCallback(callback, "{\"success\":false,\"error\":\"" + escapeJson(errorMsg) + "\"}");
+                });
+    }
+    
+    /**
+     * 批量翻译多个句子
+     * @param jsonArray JSON数组字符串，包含要翻译的文本列表
+     * @param callback JS回调函数名
+     */
+    @JavascriptInterface
+    public void translateBatch(String jsonArray, String callback) {
+        if (!translatorInitialized || englishToChineseTranslator == null) {
+            runJsCallback(callback, "{\"success\":false,\"error\":\"翻译器未初始化\"}");
+            return;
+        }
+        
+        try {
+            org.json.JSONArray inputArray = new org.json.JSONArray(jsonArray);
+            org.json.JSONArray resultArray = new org.json.JSONArray();
+            final int[] completedCount = {0};
+            final int total = inputArray.length();
+            
+            if (total == 0) {
+                runJsCallback(callback, "{\"success\":true,\"results\":[]}");
+                return;
+            }
+            
+            for (int i = 0; i < total; i++) {
+                final int index = i;
+                final String text = inputArray.getString(i);
+                
+                englishToChineseTranslator.translate(text)
+                        .addOnSuccessListener(translatedText -> {
+                            JSONObject item = new JSONObject();
+                            try {
+                                item.put("index", index);
+                                item.put("original", text);
+                                item.put("translated", translatedText);
+                                item.put("success", true);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            resultArray.put(item);
+                            
+                            completedCount[0]++;
+                            if (completedCount[0] >= total) {
+                                // 所有翻译完成，按顺序排序
+                                runJsCallback(callback, "{\"success\":true,\"results\":" + sortJsonArray(resultArray).toString() + "}");
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            JSONObject item = new JSONObject();
+                            try {
+                                item.put("index", index);
+                                item.put("original", text);
+                                item.put("translated", "");
+                                item.put("success", false);
+                                item.put("error", e.getMessage());
+                            } catch (JSONException ex) {
+                                ex.printStackTrace();
+                            }
+                            resultArray.put(item);
+                            
+                            completedCount[0]++;
+                            if (completedCount[0] >= total) {
+                                runJsCallback(callback, "{\"success\":true,\"results\":" + sortJsonArray(resultArray).toString() + "}");
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            runJsCallback(callback, "{\"success\":false,\"error\":\"\"" + escapeJson(e.getMessage()) + "\"\"}");
+        }
+    }
+    
+    /**
+     * 释放翻译器资源
+     */
+    public void shutdownTranslator() {
+        if (englishToChineseTranslator != null) {
+            englishToChineseTranslator.close();
+            englishToChineseTranslator = null;
+        }
+    }
+    
+    // ===== 文件选择器 =====
+    
+    /**
+     * 打开文件选择器（用于导入JSON文件）
+     * @param callback JS回调函数名
+     */
+    @JavascriptInterface
+    public void openFilePicker(String callback) {
+        this.filePickerCallback = callback;
+        
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/json", "text/plain", "*/*"});
+        
+        activity.runOnUiThread(() -> {
+            try {
+                activity.startActivityForResult(intent, FILE_PICKER_REQUEST_CODE);
+            } catch (Exception e) {
+                showToast("无法打开文件选择器");
+                runJsCallback(callback, "{\"success\":false,\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
+            }
+        });
+    }
+    
+    /**
+     * 处理文件选择结果（由MainActivity调用）
+     */
+    public void handleFilePickerResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode != FILE_PICKER_REQUEST_CODE || filePickerCallback == null) {
+            return;
+        }
+        
+        if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) {
+            runJsCallback(filePickerCallback, "{\"success\":false,\"error\":\"用户取消选择\"}");
+            filePickerCallback = null;
+            return;
+        }
+        
+        Uri uri = data.getData();
+        try {
+            // 读取文件内容
+            String content = readFileFromUri(uri);
+            String fileName = getFileNameFromUri(uri);
+            
+            // 返回文件内容和文件名
+            String result = "{\"success\":true,\"fileName\":\"" + escapeJson(fileName) + "\",\"content\":\"" + escapeJson(content) + "\"}";
+            runJsCallback(filePickerCallback, result);
+        } catch (Exception e) {
+            runJsCallback(filePickerCallback, "{\"success\":false,\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
+        }
+        
+        filePickerCallback = null;
+    }
+    
+    /**
+     * 从Uri读取文件内容
+     */
+    private String readFileFromUri(Uri uri) throws IOException {
+        StringBuilder content = new StringBuilder();
+        try (InputStream inputStream = context.getContentResolver().openInputStream(uri);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        }
+        return content.toString();
+    }
+    
+    /**
+     * 从Uri获取文件名
+     */
+    private String getFileNameFromUri(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (android.database.Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (index >= 0) {
+                        result = cursor.getString(index);
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getLastPathSegment();
+        }
+        return result != null ? result : "unknown";
+    }
+    
+    // ===== 辅助方法 =====
+    
+    /**
+     * 运行JS回调
+     */
+    private void runJsCallback(String callback, String jsonData) {
+        activity.runOnUiThread(() -> {
+            if (activity instanceof MainActivity) {
+                MainActivity mainActivity = (MainActivity) activity;
+                mainActivity.runJavaScript(callback + "(" + jsonData + ")");
+            }
+        });
+    }
+    
+    /**
+     * 转义JSON字符串
+     */
+    private String escapeJson(String str) {
+        if (str == null) return "";
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
+    }
+    
+    /**
+     * 按index排序JSON数组
+     */
+    private org.json.JSONArray sortJsonArray(org.json.JSONArray array) {
+        try {
+            java.util.List<JSONObject> list = new java.util.ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                list.add(array.getJSONObject(i));
+            }
+            list.sort((a, b) -> {
+                try {
+                    return Integer.compare(a.getInt("index"), b.getInt("index"));
+                } catch (JSONException e) {
+                    return 0;
+                }
+            });
+            org.json.JSONArray sorted = new org.json.JSONArray();
+            for (JSONObject obj : list) {
+                sorted.put(obj);
+            }
+            return sorted;
+        } catch (Exception e) {
+            return array;
         }
     }
 }

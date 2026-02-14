@@ -6813,6 +6813,56 @@ body {
     line-height: 1.6;
     color: var(--text-secondary);
     background: var(--bg-secondary);
+}
+
+/* 翻译中动画 */
+.translating {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary);
+    font-size: 13px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* ML Kit 翻译提示 */
+.mlkit-translate-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 8px;
+    margin: 8px 16px 16px;
+    font-size: 13px;
+    color: var(--primary-light);
+}
+
+.mlkit-translate-hint .hint-icon {
+    font-size: 16px;
+}
+
+.mlkit-download-btn {
+    margin-left: auto;
+    padding: 4px 10px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mlkit-download-btn:hover {
+    background: var(--primary-light);
+}
     border-left: 3px solid var(--primary);
     margin-left: 16px;
     margin-right: 16px;
@@ -7030,5 +7080,105 @@ body {
         font-size: 13px;
         margin-left: 12px;
         margin-right: 12px;
+    }
+}
+
+/* ===== 逐句对照阅读样式 ===== */
+.reading-sentences-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.reading-sentence-pair {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.reading-sentence-pair:hover {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
+
+.reading-sentence-pair.active {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.reading-english-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.reading-english-line .reading-sentence-number {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.reading-en-text {
+    flex: 1;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+.reading-chinese-line {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.reading-chinese-line .reading-zh-text {
+    display: block;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding-left: 40px;
+}
+
+/* 翻译加载中状态 */
+.reading-chinese-line .translating {
+    color: var(--primary);
+    font-size: 14px;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .reading-sentence-pair {
+        padding: 12px;
+        gap: 8px;
+    }
+    
+    .reading-english-line .reading-sentence-number {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    
+    .reading-en-text {
+        font-size: 15px;
+    }
+    
+    .reading-chinese-line .reading-zh-text {
+        font-size: 14px;
+        padding-left: 36px;
     }
 }

@@ -3480,67 +3480,103 @@ const app = {
     },
 
     loadDefaultReadingPapers() {
-        // 加载示例英语阅读文章
+        // 从 JSON 文件加载完整的 35 篇真题
+        this.loadReadingDataFromFile();
+    },
+    
+    // 从本地 JSON 文件加载英语阅读数据
+    loadReadingDataFromFile() {
+        // 在 Android APP 中使用原生接口读取 assets 文件
+        if (typeof Android !== 'undefined' && Android.readAssetFile) {
+            Android.readAssetFile('www/data/english_reading_35_passages.json', 'app.onReadingDataLoaded');
+        } else {
+            // 在浏览器环境中使用 fetch
+            this.loadReadingDataWithFetch();
+        }
+    },
+    
+    // Android 数据加载回调
+    onReadingDataLoaded(result) {
+        const data = typeof result === 'string' ? JSON.parse(result) : result;
+        
+        if (data.success) {
+            try {
+                const jsonData = JSON.parse(data.content);
+                if (jsonData.articles && Array.isArray(jsonData.articles)) {
+                    // 为每篇文章添加 id 和状态字段
+                    app.readingPapers = jsonData.articles.map((article, index) => ({
+                        ...article,
+                        id: Date.now() + index,
+                        favorite: false,
+                        completed: false
+                    }));
+                    app.saveReadingPapers();
+                    app.renderReadingPapers();
+                    console.log(`✅ 成功加载 ${app.readingPapers.length} 篇文章`);
+                } else {
+                    throw new Error('数据格式错误');
+                }
+            } catch (e) {
+                console.error('解析数据失败:', e);
+                app.loadFallbackReadingPapers();
+            }
+        } else {
+            console.error('加载数据失败:', data.error);
+            app.loadFallbackReadingPapers();
+        }
+    },
+    
+    // 浏览器环境下使用 fetch 加载
+    loadReadingDataWithFetch() {
+        const filePath = 'data/english_reading_35_passages.json';
+        
+        fetch(filePath)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('无法加载数据文件');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.articles && Array.isArray(data.articles)) {
+                    this.readingPapers = data.articles.map((article, index) => ({
+                        ...article,
+                        id: Date.now() + index,
+                        favorite: false,
+                        completed: false
+                    }));
+                    this.saveReadingPapers();
+                    this.renderReadingPapers();
+                    console.log(`✅ 成功加载 ${this.readingPapers.length} 篇文章`);
+                } else {
+                    throw new Error('数据格式错误');
+                }
+            })
+            .catch(error => {
+                console.error('加载阅读数据失败:', error);
+                this.loadFallbackReadingPapers();
+            });
+    },
+    
+    // 备用示例数据（当 JSON 文件加载失败时使用）
+    loadFallbackReadingPapers() {
+        console.warn('使用备用示例数据');
         this.readingPapers = [
             {
                 id: 1,
                 year: '2024',
-                title: 'The Impact of Technology on Education',
-                source: '2024年申硕英语真题 Passage 1',
+                title: '示例文章 - 数据加载失败',
+                source: '请检查 data/english_reading_35_passages.json 文件',
                 sentences: [
-                    { en: 'Technology has transformed the way we learn and teach in the 21st century.', zh: '科技已经改变了21世纪我们学习和教学的方式。' },
-                    { en: 'Online platforms allow students to access educational resources from anywhere in the world.', zh: '在线平台让学生可以从世界任何地方获取教育资源。' },
-                    { en: 'However, some experts argue that excessive screen time may affect students\' physical health.', zh: '然而，一些专家认为过度的屏幕时间可能会影响学生的身体健康。' },
-                    { en: 'Therefore, it is important to find a balance between digital learning and traditional methods.', zh: '因此，在数字化学习和传统方法之间找到平衡是很重要的。' },
-                    { en: 'Teachers should integrate technology wisely to enhance rather than replace human interaction.', zh: '教师应该明智地整合科技，以增强而不是取代人际互动。' },
-                    { en: 'Ultimately, the goal of education remains the same: to cultivate critical thinking and creativity.', zh: '最终，教育的目标仍然相同：培养批判性思维和创造力。' }
+                    { en: 'Failed to load reading data. Please check the data file.', zh: '加载阅读数据失败，请检查数据文件。' }
                 ],
-                questions: [
-                    { q: 'What is the main idea of this passage?', options: ['A. Technology is harmful', 'B. Technology changes education', 'C. Traditional methods are better', 'D. Students need less screen time'], answer: 'B' }
-                ],
-                favorite: false,
-                completed: false
-            },
-            {
-                id: 2,
-                year: '2023',
-                title: 'Climate Change and Our Responsibility',
-                source: '2023年申硕英语真题 Passage 2',
-                sentences: [
-                    { en: 'Climate change is one of the most pressing challenges facing humanity today.', zh: '气候变化是当今人类面临的最紧迫挑战之一。' },
-                    { en: 'Rising global temperatures have led to melting ice caps and rising sea levels.', zh: '全球气温上升导致冰盖融化和海平面上升。' },
-                    { en: 'Many island nations are particularly vulnerable to these environmental changes.', zh: '许多岛国特别容易受到这些环境变化的影响。' },
-                    { en: 'Governments around the world have pledged to reduce carbon emissions by 2050.', zh: '世界各国政府已承诺到2050年减少碳排放。' },
-                    { en: 'But individual actions also matter significantly in addressing this global crisis.', zh: '但个人行动在应对这一全球危机方面也非常重要。' },
-                    { en: 'Simple steps like reducing waste and conserving energy can make a real difference.', zh: '像减少浪费和节约能源这样的简单步骤可以产生真正的影响。' }
-                ],
-                questions: [
-                    { q: 'According to the passage, who is responsible for fighting climate change?', options: ['A. Only governments', 'B. Only individuals', 'C. Both governments and individuals', 'D. Only scientists'], answer: 'C' }
-                ],
-                favorite: false,
-                completed: false
-            },
-            {
-                id: 3,
-                year: '2022',
-                title: 'The Art of Time Management',
-                source: '2022年申硕英语真题 Passage 1',
-                sentences: [
-                    { en: 'In our fast-paced modern world, time management has become an essential skill.', zh: '在我们快节奏的现代世界中，时间管理已成为一项必备技能。' },
-                    { en: 'Successful people often attribute their achievements to effective planning and prioritization.', zh: '成功人士经常将他们的成就归功于有效的规划和优先排序。' },
-                    { en: 'The Pomodoro Technique, which involves working in focused intervals, has gained popularity.', zh: '番茄工作法涉及在专注的间隔时间内工作，已经广受欢迎。' },
-                    { en: 'This method suggests working for 25 minutes and then taking a 5-minute break.', zh: '这个方法建议工作25分钟，然后休息5分钟。' },
-                    { en: 'Regular breaks help maintain concentration and prevent mental fatigue.', zh: '定期休息有助于保持注意力并防止精神疲劳。' },
-                    { en: 'Remember that managing time well means having more time for what truly matters in life.', zh: '记住，管理好时间意味着有更多时间去做生活中真正重要的事情。' }
-                ],
-                questions: [
-                    { q: 'What is the Pomodoro Technique mentioned in the passage?', options: ['A. A time management method', 'B. A cooking technique', 'C. An exercise program', 'D. A meditation practice'], answer: 'A' }
-                ],
+                questions: [],
                 favorite: false,
                 completed: false
             }
         ];
         this.saveReadingPapers();
+        this.renderReadingPapers();
     },
 
     saveReadingPapers() {
@@ -3606,21 +3642,27 @@ const app = {
         document.getElementById('page-reading').style.display = 'none';
         document.getElementById('page-reading-detail').style.display = 'block';
         
+        // 检查并显示 ML Kit 提示
+        this.updateMlKitHint();
+        
         const contentDiv = document.getElementById('reading-detail-content');
+        // 逐句对照显示：英文在上，中文在下，每句独立
         contentDiv.innerHTML = `
             <div class="reading-article-title">${paper.title}</div>
             <div class="reading-article-source">${paper.source}</div>
-            ${paper.sentences.map((s, i) => `
-                <div class="reading-sentence" id="sentence-${i}" onclick="app.toggleSentenceTranslation(${i})">
-                    <div class="reading-english">
-                        <span class="reading-sentence-number">${i + 1}</span>
-                        ${s.en}
+            <div class="reading-sentences-container">
+                ${paper.sentences.map((s, i) => `
+                    <div class="reading-sentence-pair" id="sentence-pair-${i}" onclick="app.toggleSentenceTranslation(${i})">
+                        <div class="reading-english-line">
+                            <span class="reading-sentence-number">${i + 1}</span>
+                            <span class="reading-en-text">${s.en}</span>
+                        </div>
+                        <div class="reading-chinese-line" id="translation-${i}" style="display: ${this.showAllTranslation ? 'block' : 'none'}">
+                            <span class="reading-zh-text">${s.zh || '（点击获取翻译）'}</span>
+                        </div>
                     </div>
-                    <div class="reading-chinese" id="translation-${i}" style="display: ${this.showAllTranslation ? 'block' : 'none'}">
-                        ${s.zh}
-                    </div>
-                </div>
-            `).join('')}
+                `).join('')}
+            </div>
         `;
         
         document.getElementById('reading-progress-text').textContent = `${paper.sentences.length}句`;
@@ -3628,6 +3670,27 @@ const app = {
         const favBtn = document.getElementById('reading-fav-btn');
         favBtn.textContent = paper.favorite ? '❤️' : '🤍';
         favBtn.classList.toggle('active', paper.favorite);
+    },
+    
+    // 更新 ML Kit 状态提示
+    updateMlKitHint() {
+        const hintDiv = document.getElementById('mlkit-translate-hint');
+        const downloadBtn = document.getElementById('mlkit-download-btn');
+        
+        if (!hintDiv || typeof Android === 'undefined') {
+            if (hintDiv) hintDiv.style.display = 'none';
+            return;
+        }
+        
+        // 只在 APP 环境下显示
+        hintDiv.style.display = 'flex';
+        
+        // 检查模型状态
+        if (this.checkMlKitModel()) {
+            hintDiv.innerHTML = '<span class="hint-icon">✅</span><span>AI 本地翻译已就绪，点击句子即可翻译</span>';
+        } else {
+            downloadBtn.style.display = 'block';
+        }
     },
 
     closeReadingDetail() {
@@ -3637,17 +3700,157 @@ const app = {
         this.showAllTranslation = false;
     },
 
+    // ML Kit 翻译相关状态
+    translationCache: {},  // 缓存翻译结果
+    isTranslating: false,  // 是否正在翻译
+    mlkitModelReady: false, // 模型是否就绪
+    
+    // 检查 ML Kit 翻译模型状态
+    checkMlKitModel() {
+        if (typeof Android !== 'undefined' && Android.isTranslationModelDownloaded) {
+            this.mlkitModelReady = Android.isTranslationModelDownloaded();
+            return this.mlkitModelReady;
+        }
+        return false;
+    },
+    
+    // 下载 ML Kit 翻译模型
+    downloadMlKitModel() {
+        if (typeof Android === 'undefined' || !Android.downloadTranslationModel) {
+            this.showToast('ML Kit 翻译不可用');
+            return;
+        }
+        
+        this.showToast('正在下载翻译模型，请稍候...');
+        Android.downloadTranslationModel('app.onMlKitModelDownloaded');
+    },
+    
+    // ML Kit 模型下载回调
+    onMlKitModelDownloaded(result) {
+        const data = typeof result === 'string' ? JSON.parse(result) : result;
+        if (data.success) {
+            app.mlkitModelReady = true;
+            app.showToast('翻译模型下载完成！');
+        } else {
+            app.showToast('模型下载失败: ' + (data.error || '未知错误'));
+        }
+    },
+    
     toggleSentenceTranslation(index) {
         const translationDiv = document.getElementById(`translation-${index}`);
-        const sentenceDiv = document.getElementById(`sentence-${index}`);
+        const sentencePairDiv = document.getElementById(`sentence-pair-${index}`);
+        const paper = this.readingPapers[this.currentReadingIndex];
         
+        if (!paper || !paper.sentences[index]) return;
+        
+        const sentence = paper.sentences[index];
+        const cacheKey = paper.id + '-' + index;
+        
+        // 如果要显示翻译
         if (translationDiv.style.display === 'none') {
-            translationDiv.style.display = 'block';
-            sentenceDiv.classList.add('active');
+            // 1. 如果有预置中文翻译，直接显示
+            if (sentence.zh && sentence.zh.trim()) {
+                const zhText = translationDiv.querySelector('.reading-zh-text');
+                if (zhText) zhText.textContent = sentence.zh;
+                translationDiv.style.display = 'block';
+                sentencePairDiv.classList.add('active');
+                return;
+            }
+            
+            // 2. 检查缓存
+            if (this.translationCache[cacheKey]) {
+                const translatedText = this.translationCache[cacheKey];
+                const zhText = translationDiv.querySelector('.reading-zh-text');
+                if (zhText) zhText.textContent = translatedText;
+                sentence.zh = translatedText; // 保存到数据
+                translationDiv.style.display = 'block';
+                sentencePairDiv.classList.add('active');
+                this.saveReadingPapers();
+                return;
+            }
+            
+            // 3. 使用 ML Kit 实时翻译
+            if (typeof Android !== 'undefined' && Android.translateEnglishToChinese) {
+                // 检查模型是否就绪
+                if (!this.mlkitModelReady && !this.checkMlKitModel()) {
+                    // 尝试下载模型
+                    this.downloadMlKitModel();
+                    return;
+                }
+                
+                // 显示加载状态
+                const zhText = translationDiv.querySelector('.reading-zh-text');
+                if (zhText) zhText.innerHTML = '🔄 正在翻译...';
+                translationDiv.style.display = 'block';
+                sentencePairDiv.classList.add('active');
+                
+                // 调用 Android ML Kit 翻译
+                const englishText = sentence.en;
+                Android.translateEnglishToChinese(englishText, 'app.onSentenceTranslated');
+                
+                // 保存当前翻译的上下文，用于回调
+                this._currentTranslatingIndex = index;
+                this._currentTranslatingCacheKey = cacheKey;
+            } else {
+                // Web 环境或 ML Kit 不可用
+                const zhText = translationDiv.querySelector('.reading-zh-text');
+                if (zhText) zhText.textContent = '（请使用 APP 获取翻译）';
+                translationDiv.style.display = 'block';
+                sentencePairDiv.classList.add('active');
+            }
         } else {
+            // 隐藏翻译
             translationDiv.style.display = 'none';
-            sentenceDiv.classList.remove('active');
+            sentencePairDiv.classList.remove('active');
         }
+    },
+    
+    // ML Kit 翻译结果回调
+    onSentenceTranslated(result) {
+        const data = typeof result === 'string' ? JSON.parse(result) : result;
+        const index = app._currentTranslatingIndex;
+        const cacheKey = app._currentTranslatingCacheKey;
+        
+        if (index === undefined || !app.readingPapers[app.currentReadingIndex]) return;
+        
+        const translationDiv = document.getElementById(`translation-${index}`);
+        const paper = app.readingPapers[app.currentReadingIndex];
+        
+        if (data.success) {
+            const translatedText = data.translated;
+            
+            // 更新显示
+            if (translationDiv) {
+                const zhText = translationDiv.querySelector('.reading-zh-text');
+                if (zhText) zhText.textContent = translatedText;
+            }
+            
+            // 保存到缓存和数据
+            app.translationCache[cacheKey] = translatedText;
+            if (paper.sentences[index]) {
+                paper.sentences[index].zh = translatedText;
+                app.saveReadingPapers();
+            }
+            
+            // 显示成功提示
+            app.showToast('翻译完成');
+        } else {
+            // 翻译失败
+            if (translationDiv) {
+                const zhText = translationDiv.querySelector('.reading-zh-text');
+                if (zhText) zhText.innerHTML = '<span style="color:#ef4444;">❌ ' + (data.error || '翻译失败') + '</span>';
+            }
+            
+            // 如果是模型未下载的错误，提示用户下载
+            if (data.error && data.error.includes('模型')) {
+                if (confirm('翻译模型未下载，是否立即下载？（约 30MB，建议在 WiFi 下下载）')) {
+                    app.downloadMlKitModel();
+                }
+            }
+        }
+        
+        app._currentTranslatingIndex = undefined;
+        app._currentTranslatingCacheKey = undefined;
     },
 
     toggleAllTranslation() {
@@ -3656,10 +3859,10 @@ const app = {
         if (paper) {
             paper.sentences.forEach((_, i) => {
                 const translationDiv = document.getElementById(`translation-${i}`);
-                const sentenceDiv = document.getElementById(`sentence-${i}`);
+                const sentencePairDiv = document.getElementById(`sentence-pair-${i}`);
                 if (translationDiv) {
                     translationDiv.style.display = this.showAllTranslation ? 'block' : 'none';
-                    sentenceDiv.classList.toggle('active', this.showAllTranslation);
+                    sentencePairDiv.classList.toggle('active', this.showAllTranslation);
                 }
             });
         }
@@ -3692,68 +3895,108 @@ const app = {
     },
 
     showImportReadingModal() {
-        // 导入英语阅读文章
+        // 导入英语阅读文章 - 优先使用Android原生文件选择器
+        if (typeof Android !== 'undefined' && Android.openFilePicker) {
+            Android.openFilePicker('app.onReadingFileSelected');
+        } else {
+            // 降级使用Web文件选择器
+            this.showWebFilePicker();
+        }
+    },
+    
+    // Web环境文件选择器（降级方案）
+    showWebFilePicker() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
         input.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        let importedCount = 0;
-                        
-                        // 格式1: 包含 articles 数组的批量导入
-                        if (data.articles && Array.isArray(data.articles)) {
-                            data.articles.forEach(article => {
-                                if (this.validateReadingArticle(article)) {
-                                    article.id = Date.now() + Math.random();
-                                    article.favorite = false;
-                                    article.completed = false;
-                                    this.readingPapers.push(article);
-                                    importedCount++;
-                                }
-                            });
-                        }
-                        // 格式2: 单篇文章直接导入
-                        else if (this.validateReadingArticle(data)) {
-                            data.id = Date.now();
-                            data.favorite = false;
-                            data.completed = false;
-                            this.readingPapers.push(data);
-                            importedCount++;
-                        }
-                        // 格式3: 旧版数组格式
-                        else if (Array.isArray(data)) {
-                            data.forEach(article => {
-                                if (this.validateReadingArticle(article)) {
-                                    article.id = Date.now() + Math.random();
-                                    article.favorite = article.favorite || false;
-                                    article.completed = article.completed || false;
-                                    this.readingPapers.push(article);
-                                    importedCount++;
-                                }
-                            });
-                        }
-                        
-                        if (importedCount > 0) {
-                            this.saveReadingPapers();
-                            this.renderReadingPapers();
-                            this.showToast(`✅ 成功导入 ${importedCount} 篇文章`);
-                        } else {
-                            alert('导入失败：未找到有效的文章数据\n\n请检查JSON格式是否符合模板要求');
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        alert('导入失败：文件格式错误\n\n请确保上传的是有效的JSON文件');
-                    }
-                };
-                reader.readAsText(file);
+                this.processReadingFile(file);
             }
         };
         input.click();
+    },
+    
+    // Android文件选择回调
+    onReadingFileSelected(result) {
+        const data = typeof result === 'string' ? JSON.parse(result) : result;
+        
+        if (!data.success) {
+            if (data.error !== '用户取消选择') {
+                app.showToast('选择文件失败: ' + (data.error || '未知错误'));
+            }
+            return;
+        }
+        
+        try {
+            const jsonData = JSON.parse(data.content);
+            app.processReadingData(jsonData);
+        } catch (e) {
+            console.error('解析JSON失败:', e);
+            app.showToast('文件格式错误: 请确保选择有效的JSON文件');
+        }
+    },
+    
+    // 处理文件对象（Web环境）
+    processReadingFile(file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                this.processReadingData(data);
+            } catch (err) {
+                console.error(err);
+                this.showToast('导入失败：文件格式错误');
+            }
+        };
+        reader.readAsText(file);
+    },
+    
+    // 处理阅读数据导入
+    processReadingData(data) {
+        let importedCount = 0;
+        
+        // 格式1: 包含 articles 数组的批量导入
+        if (data.articles && Array.isArray(data.articles)) {
+            data.articles.forEach(article => {
+                if (this.validateReadingArticle(article)) {
+                    article.id = Date.now() + Math.random();
+                    article.favorite = false;
+                    article.completed = false;
+                    this.readingPapers.push(article);
+                    importedCount++;
+                }
+            });
+        }
+        // 格式2: 单篇文章直接导入
+        else if (this.validateReadingArticle(data)) {
+            data.id = Date.now();
+            data.favorite = false;
+            data.completed = false;
+            this.readingPapers.push(data);
+            importedCount++;
+        }
+        // 格式3: 旧版数组格式
+        else if (Array.isArray(data)) {
+            data.forEach(article => {
+                if (this.validateReadingArticle(article)) {
+                    article.id = Date.now() + Math.random();
+                    article.favorite = article.favorite || false;
+                    article.completed = article.completed || false;
+                    this.readingPapers.push(article);
+                    importedCount++;
+                }
+            });
+        }
+        
+        if (importedCount > 0) {
+            this.saveReadingPapers();
+            this.renderReadingPapers();
+            this.showToast(`✅ 成功导入 ${importedCount} 篇文章`);
+        } else {
+            this.showToast('导入失败：未找到有效的文章数据');
+        }
     },
 
     validateReadingArticle(article) {

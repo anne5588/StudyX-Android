@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     
+    <!-- 录音权限（学习卡片录音功能） -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    
     <!-- 
         注意：热更新使用 getExternalFilesDir() 存储在应用专属目录
         这是应用的私有目录，不需要申请任何存储权限！

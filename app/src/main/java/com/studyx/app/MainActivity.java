@@ -3,9 +3,12 @@ package com.studyx.app;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -15,6 +18,10 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -130,6 +137,31 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(WebView view, int newProgress) {
                 // 可以在这里更新进度条
             }
+            
+            @Override
+            public void onPermissionRequest(PermissionRequest request) {
+                // 处理WebView权限请求（录音等）
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    String[] resources = request.getResources();
+                    for (String resource : resources) {
+                        if (resource.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+                            // 检查录音权限
+                            if (ContextCompat.checkSelfPermission(MainActivity.this, 
+                                    android.Manifest.permission.RECORD_AUDIO) 
+                                    == PackageManager.PERMISSION_GRANTED) {
+                                request.grant(new String[]{PermissionRequest.RESOURCE_AUDIO_CAPTURE});
+                            } else {
+                                // 申请录音权限
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{android.Manifest.permission.RECORD_AUDIO}, 100);
+                                request.deny();
+                            }
+                            return;
+                        }
+                    }
+                    request.grant(resources);
+                }
+            }
         });
         
         // 下拉刷新
@@ -235,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
         // 释放TTS资源
         if (webAppInterface != null) {
             webAppInterface.shutdownTts();
+            webAppInterface.shutdownTranslator();
         }
         
         if (webView != null) {
@@ -245,5 +278,39 @@ public class MainActivity extends AppCompatActivity {
             webView = null;
         }
         super.onDestroy();
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, 
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "录音权限已授权，请重新点击录音按钮", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "需要录音权限才能使用录音功能", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // 将结果传递给 WebAppInterface 处理文件选择
+        if (webAppInterface != null) {
+            webAppInterface.handleFilePickerResult(requestCode, resultCode, data);
+        }
+    }
+    
+    /**
+     * 执行JavaScript代码
+     * @param script 要执行的JS代码
+     */
+    public void runJavaScript(String script) {
+        if (webView != null) {
+            runOnUiThread(() -> {
+                webView.evaluateJavascript(script, null);
+            });
+        }
     }
 }
