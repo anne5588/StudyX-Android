@@ -2960,6 +2960,7 @@ const app = {
     initCalculator() {
         this.loadCalcQuestions();
         this.renderCalcQuestions();
+        this.initCalcModalEvents();
     },
 
     loadCalcQuestions() {
@@ -3301,6 +3302,24 @@ const app = {
         if (modal) {
             modal.style.display = 'none';
             document.body.style.overflow = '';
+        }
+    },
+
+    initCalcModalEvents() {
+        // 点击遮罩关闭弹窗
+        const modal = document.getElementById('calc-detail-modal');
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closeCalcDetailModal();
+                }
+            });
+            // ESC键关闭
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.style.display === 'flex') {
+                    this.closeCalcDetailModal();
+                }
+            });
         }
     },
 
