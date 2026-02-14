@@ -94,13 +94,13 @@
                 <span class="nav-icon">📚</span>
                 <span>学习</span>
             </div>
-            <div class="mobile-nav-item" data-page="vocabulary">
-                <span class="nav-icon">🔤</span>
-                <span>英语</span>
+            <div class="mobile-nav-item" data-page="calculator">
+                <span class="nav-icon">📝</span>
+                <span>计算</span>
             </div>
-            <div class="mobile-nav-item" data-page="review">
-                <span class="nav-icon">🔄</span>
-                <span>复习</span>
+            <div class="mobile-nav-item" data-page="reading">
+                <span class="nav-icon">📖</span>
+                <span>阅读</span>
             </div>
             <div class="mobile-nav-item" data-page="more">
                 <span class="nav-icon">⚙️</span>
@@ -216,6 +216,14 @@
                                 <div class="card-info">
                                     <span class="card-title">开始复习</span>
                                     <span class="card-desc">今日需复习 0 个</span>
+                                </div>
+                                <span class="card-arrow">›</span>
+                            </div>
+                            <div class="quick-start-card english" onclick="app.switchPage('vocabulary')">
+                                <div class="card-icon">🔤</div>
+                                <div class="card-info">
+                                    <span class="card-title">英语学习</span>
+                                    <span class="card-desc">词汇学习与复习</span>
                                 </div>
                                 <span class="card-arrow">›</span>
                             </div>
@@ -823,6 +831,68 @@
                                 <span class="empty-icon">📝</span>
                                 <p>选择月份或点击生成按钮查看月报</p>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 经济计算题库页面 -->
+                <div class="page" id="page-calculator">
+                    <div class="calc-bank-header">
+                        <h2>📚 经济计算题库</h2>
+                        <p>经济学计算题练习，支持导入/导出试题</p>
+                        <div class="calc-bank-actions">
+                            <button class="calc-action-btn" onclick="app.showImportCalcModal()">📤 导入试题</button>
+                            <button class="calc-action-btn" onclick="app.showAddCalcModal()">➕ 新建试题</button>
+                            <button class="calc-action-btn" onclick="app.exportCalcQuestions()">📥 导出试题</button>
+                        </div>
+                    </div>
+
+                    <div class="calc-filter">
+                        <button class="calc-filter-btn active" data-type="all">全部</button>
+                        <button class="calc-filter-btn" data-type="micro">微观经济学</button>
+                        <button class="calc-filter-btn" data-type="macro">宏观经济学</button>
+                        <button class="calc-filter-btn" data-type="fiscal">财政学</button>
+                        <button class="calc-filter-btn" data-type="monetary">货币银行</button>
+                    </div>
+
+                    <div class="calc-question-list" id="calc-question-list">
+                        <!-- 计算题列表动态生成 -->
+                        <div class="calc-empty">
+                            <span class="empty-icon">📚</span>
+                            <p>暂无计算题</p>
+                            <button onclick="app.showAddCalcModal()">添加第一道试题</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 英语阅读理解页面 -->
+                <div class="page" id="page-reading">
+                    <div class="reading-header">
+                        <h2>📖 英语阅读理解</h2>
+                        <p>历年申硕英语真题，支持导入/导出试卷</p>
+                        <div class="reading-actions">
+                            <button class="reading-action-btn" onclick="app.showImportReadingModal()">📤 导入试卷</button>
+                            <button class="reading-action-btn" onclick="app.showAddReadingModal()">➕ 新建试卷</button>
+                            <button class="reading-action-btn" onclick="app.exportReadingPapers()">📥 导出试卷</button>
+                        </div>
+                    </div>
+
+                    <div class="reading-filter">
+                        <button class="reading-filter-btn active" data-year="all">全部年份</button>
+                        <button class="reading-filter-btn" data-year="2025">2025</button>
+                        <button class="reading-filter-btn" data-year="2024">2024</button>
+                        <button class="reading-filter-btn" data-year="2023">2023</button>
+                        <button class="reading-filter-btn" data-year="2022">2022</button>
+                        <button class="reading-filter-btn" data-year="older">更早</button>
+                    </div>
+
+                    <div class="reading-paper-list" id="reading-paper-list">
+                        <!-- 英语试卷列表动态生成 -->
+                        <div class="reading-empty">
+                            <span class="empty-icon">📖</span>
+                            <p>暂无英语试卷</p>
+                            <p class="empty-tip">支持导入13-25年申硕英语真题</p>
+                            <button onclick="app.showImportReadingModal()">导入试卷</button>
                         </div>
                     </div>
                 </div>

@@ -196,9 +196,11 @@ const app = {
             schedule: '学习计划',
             videos: '视频课程',
             daily: '学习日报',
-            reports: '周报月报'
+            reports: '周报月报',
+            calculator: '学习计算器',
+            reading: '学习阅读'
         };
-        document.getElementById('page-title').textContent = titles[page];
+        document.getElementById('page-title').textContent = titles[page] || '学习';
 
         this.currentPage = page;
 
@@ -215,6 +217,8 @@ const app = {
             this.initVocabulary();
             this.renderImportedList();
         }
+        if (page === 'calculator') this.initCalculator();
+        if (page === 'reading') this.initReading();
     },
 
     // 显示更多菜单（手机端）
@@ -2947,6 +2951,360 @@ const app = {
         
         this.closeImportModal();
         this._pendingVocabImport = null;
+    },
+
+    // ========== 经济计算题库页面 ==========
+    calcQuestions: [],
+    currentCalcFilter: 'all',
+
+    initCalculator() {
+        this.loadCalcQuestions();
+        this.renderCalcQuestions();
+    },
+
+    loadCalcQuestions() {
+        // 从localStorage加载计算题
+        const saved = localStorage.getItem('studyx_calc_questions');
+        if (saved) {
+            this.calcQuestions = JSON.parse(saved);
+        } else {
+            // 首次加载时从JSON文件导入默认题库
+            this.loadDefaultCalcQuestions();
+        }
+    },
+
+    async loadDefaultCalcQuestions() {
+        try {
+            const response = await fetch('data/economics_calc_questions.json');
+            if (response.ok) {
+                const questions = await response.json();
+                this.calcQuestions = questions;
+                this.saveCalcQuestions();
+                this.renderCalcQuestions();
+                console.log('✅ 已加载经济学计算题真题库');
+            }
+        } catch (err) {
+            console.log('⚠️ 加载默认题库失败:', err);
+            this.calcQuestions = [];
+        }
+    },
+
+    saveCalcQuestions() {
+        localStorage.setItem('studyx_calc_questions', JSON.stringify(this.calcQuestions));
+    },
+
+    renderCalcQuestions() {
+        const container = document.getElementById('calc-question-list');
+        if (!container) return;
+
+        let questions = this.calcQuestions;
+        if (this.currentCalcFilter !== 'all') {
+            questions = questions.filter(q => q.type === this.currentCalcFilter);
+        }
+
+        if (questions.length === 0) {
+            container.innerHTML = `
+                <div class="calc-empty">
+                    <span class="empty-icon">📚</span>
+                    <p>暂无计算题</p>
+                    <p class="empty-tip">支持导入经济学计算题（含题目、答案、解析）</p>
+                    <button onclick="app.showAddCalcModal()">添加第一道试题</button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = questions.map((q, index) => `
+            <div class="calc-question-item" onclick="app.openCalcQuestion(${index})">
+                <div class="calc-question-header">
+                    <span class="calc-question-type">${this.getCalcTypeName(q.type)}</span>
+                    <span style="font-size:12px;color:var(--text-muted)">${q.date || ''}</span>
+                </div>
+                <div class="calc-question-title">${q.title}</div>
+                <div class="calc-question-preview">${q.content}</div>
+                <div class="calc-question-meta">
+                    <span>📝 ${q.answer ? '已有答案' : '暂无答案'}</span>
+                    <span>📖 ${q.analysis ? '已有解析' : '暂无解析'}</span>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    getCalcTypeName(type) {
+        const names = {
+            micro: '微观经济学',
+            macro: '宏观经济学',
+            fiscal: '财政学',
+            monetary: '货币银行'
+        };
+        return names[type] || type;
+    },
+
+    showAddCalcModal() {
+        // 创建添加计算题弹窗
+        let modal = document.getElementById('calc-add-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'calc-add-modal';
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width:600px;max-height:85vh;overflow-y:auto;">
+                    <div class="modal-header">
+                        <h3>➕ 新建计算题</h3>
+                        <button class="close-btn" onclick="app.closeCalcModal()">×</button>
+                    </div>
+                    <div class="modal-body" style="padding:20px;">
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--text-secondary);">题目类型</label>
+                            <select id="calc-type-input" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);">
+                                <option value="micro">微观经济学</option>
+                                <option value="macro">宏观经济学</option>
+                                <option value="fiscal">财政学</option>
+                                <option value="monetary">货币银行</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--text-secondary);">题目标题</label>
+                            <input type="text" id="calc-title-input" placeholder="输入题目标题..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);">
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--text-secondary);">题目内容</label>
+                            <textarea id="calc-content-input" rows="5" placeholder="输入题目内容..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);resize:vertical;"></textarea>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--text-secondary);">答案</label>
+                            <input type="text" id="calc-answer-input" placeholder="输入答案..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);">
+                        </div>
+                        <div style="margin-bottom:20px;">
+                            <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--text-secondary);">解析</label>
+                            <textarea id="calc-analysis-input" rows="3" placeholder="输入解析..." style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);resize:vertical;"></textarea>
+                        </div>
+                        <button onclick="app.saveCalcQuestion()" style="width:100%;padding:12px;border:none;border-radius:8px;background:var(--primary);color:white;font-size:15px;cursor:pointer;">保存试题</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        modal.style.display = 'flex';
+    },
+
+    closeCalcModal() {
+        const modal = document.getElementById('calc-add-modal');
+        if (modal) modal.style.display = 'none';
+    },
+
+    saveCalcQuestion() {
+        const type = document.getElementById('calc-type-input').value;
+        const title = document.getElementById('calc-title-input').value.trim();
+        const content = document.getElementById('calc-content-input').value.trim();
+        const answer = document.getElementById('calc-answer-input').value.trim();
+        const analysis = document.getElementById('calc-analysis-input').value.trim();
+
+        if (!title || !content) {
+            alert('请填写题目标题和内容');
+            return;
+        }
+
+        this.calcQuestions.push({
+            type,
+            title,
+            content,
+            answer,
+            analysis,
+            date: new Date().toLocaleDateString('zh-CN'),
+            id: Date.now()
+        });
+
+        this.saveCalcQuestions();
+        this.renderCalcQuestions();
+        this.closeCalcModal();
+        this.showToast('✅ 试题已保存');
+    },
+
+    openCalcQuestion(index) {
+        const q = this.calcQuestions[index];
+        alert(`题目：${q.title}\n\n${q.content}\n\n答案：${q.answer || '暂无'}\n\n解析：${q.analysis || '暂无'}`);
+    },
+
+    showImportCalcModal() {
+        // 导入计算题
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const questions = JSON.parse(event.target.result);
+                        if (Array.isArray(questions)) {
+                            this.calcQuestions = [...this.calcQuestions, ...questions];
+                            this.saveCalcQuestions();
+                            this.renderCalcQuestions();
+                            this.showToast(`✅ 成功导入 ${questions.length} 道试题`);
+                        }
+                    } catch (err) {
+                        alert('导入失败，请检查文件格式');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
+    },
+
+    exportCalcQuestions() {
+        // 导出计算题
+        const data = JSON.stringify(this.calcQuestions, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `经济计算题_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('✅ 试题已导出');
+    },
+
+    // ========== 英语阅读理解页面 ==========
+    readingPapers: [],
+    currentReadingFilter: 'all',
+
+    initReading() {
+        this.loadReadingPapers();
+        this.renderReadingPapers();
+    },
+
+    loadReadingPapers() {
+        // 从localStorage加载英语试卷
+        const saved = localStorage.getItem('studyx_reading_papers');
+        if (saved) {
+            this.readingPapers = JSON.parse(saved);
+        }
+    },
+
+    saveReadingPapers() {
+        localStorage.setItem('studyx_reading_papers', JSON.stringify(this.readingPapers));
+    },
+
+    renderReadingPapers() {
+        const container = document.getElementById('reading-paper-list');
+        if (!container) return;
+
+        let papers = this.readingPapers;
+        if (this.currentReadingFilter !== 'all') {
+            if (this.currentReadingFilter === 'older') {
+                papers = papers.filter(p => parseInt(p.year) < 2022);
+            } else {
+                papers = papers.filter(p => p.year === this.currentReadingFilter);
+            }
+        }
+
+        if (papers.length === 0) {
+            container.innerHTML = `
+                <div class="reading-empty">
+                    <span class="empty-icon">📖</span>
+                    <p>暂无英语试卷</p>
+                    <p class="empty-tip">支持导入13-25年申硕英语真题（含阅读理解、答案、解析）</p>
+                    <button onclick="app.showImportReadingModal()">导入试卷</button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = papers.map((p, index) => `
+            <div class="reading-paper-item" onclick="app.openReadingPaper(${index})">
+                <div class="reading-paper-header">
+                    <span class="reading-paper-year">${p.year}年</span>
+                    <span class="reading-paper-status ${p.completed ? 'done' : 'unread'}">${p.completed ? '✓ 已做' : '未做'}</span>
+                </div>
+                <div class="reading-paper-title">${p.title}</div>
+                <div class="reading-paper-desc">${p.desc || '申硕英语阅读理解真题'}</div>
+                <div class="reading-paper-meta">
+                    <span>📌 ${p.articles || 4}篇阅读</span>
+                    <span>🕐 约${p.time || 60}分钟</span>
+                    <span>📝 ${p.questions || 20}道题</span>
+                </div>
+            </div>
+        `).join('');
+    },
+
+    showAddReadingModal() {
+        // 新建英语试卷
+        const year = prompt('请输入年份（如2025）:');
+        if (year && year.trim()) {
+            const title = prompt('请输入试卷标题:');
+            if (title && title.trim()) {
+                this.readingPapers.push({
+                    year: year.trim(),
+                    title: title.trim(),
+                    desc: '申硕英语阅读理解',
+                    articles: 4,
+                    questions: 20,
+                    time: 60,
+                    completed: false,
+                    date: new Date().toLocaleDateString('zh-CN'),
+                    id: Date.now()
+                });
+                this.saveReadingPapers();
+                this.renderReadingPapers();
+                this.showToast('✅ 试卷已添加');
+            }
+        }
+    },
+
+    openReadingPaper(index) {
+        const p = this.readingPapers[index];
+        // 打开试卷详情（简化版）
+        const doIt = confirm(`试卷：${p.title}\n\n是否开始练习？`);
+        if (doIt) {
+            p.completed = true;
+            this.saveReadingPapers();
+            this.renderReadingPapers();
+            this.showToast('📖 开始练习！');
+        }
+    },
+
+    showImportReadingModal() {
+        // 导入英语试卷
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const papers = JSON.parse(event.target.result);
+                        if (Array.isArray(papers)) {
+                            this.readingPapers = [...this.readingPapers, ...papers];
+                            this.saveReadingPapers();
+                            this.renderReadingPapers();
+                            this.showToast(`✅ 成功导入 ${papers.length} 套试卷`);
+                        }
+                    } catch (err) {
+                        alert('导入失败，请检查文件格式');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+        input.click();
+    },
+
+    exportReadingPapers() {
+        // 导出英语试卷
+        const data = JSON.stringify(this.readingPapers, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `英语阅读真题_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('✅ 试卷已导出');
     }
 };
 
