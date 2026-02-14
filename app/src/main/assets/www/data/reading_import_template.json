@@ -1,0 +1,104 @@
+{
+  "_说明": "StudyX英语阅读导入格式 - 申硕英语真题点读版",
+  "_版本": "1.0",
+  "_导入提示": [
+    "1. year: 年份，如 2024、2023",
+    "2. title: 文章英文标题",
+    "3. source: 来源说明，如 2024年申硕英语真题 Passage 1",
+    "4. sentences: 句子数组，每句包含英文(en)和中文(zh)",
+    "5. questions: 题目数组，包含问题、选项和答案"
+  ],
+  "articles": [
+    {
+      "year": "2024",
+      "title": "The Impact of Technology on Education",
+      "source": "2024年申硕英语真题 Passage 1",
+      "sentences": [
+        {
+          "en": "Technology has transformed the way we learn and teach in the 21st century.",
+          "zh": "科技已经改变了21世纪我们学习和教学的方式。"
+        },
+        {
+          "en": "Online platforms allow students to access educational resources from anywhere in the world.",
+          "zh": "在线平台让学生可以从世界任何地方获取教育资源。"
+        },
+        {
+          "en": "However, some experts argue that excessive screen time may affect students' physical health.",
+          "zh": "然而，一些专家认为过度的屏幕时间可能会影响学生的身体健康。"
+        },
+        {
+          "en": "Therefore, it is important to find a balance between digital learning and traditional methods.",
+          "zh": "因此，在数字化学习和传统方法之间找到平衡是很重要的。"
+        },
+        {
+          "en": "Teachers should integrate technology wisely to enhance rather than replace human interaction.",
+          "zh": "教师应该明智地整合科技，以增强而不是取代人际互动。"
+        }
+      ],
+      "questions": [
+        {
+          "q": "What is the main idea of this passage?",
+          "options": [
+            "A. Technology is harmful to education",
+            "B. Technology has changed education significantly",
+            "C. Traditional teaching methods are better",
+            "D. Students should avoid using technology"
+          ],
+          "answer": "B",
+          "analysis": "文章主要讨论了科技如何改变教育，以及需要平衡使用。"
+        },
+        {
+          "q": "According to the passage, what should teachers do?",
+          "options": [
+            "A. Replace all traditional teaching methods",
+            "B. Avoid using technology in classrooms",
+            "C. Use technology to enhance human interaction",
+            "D. Limit students' screen time completely"
+          ],
+          "answer": "C",
+          "analysis": "文中提到教师应该明智地整合科技，以增强而不是取代人际互动。"
+        }
+      ]
+    },
+    {
+      "year": "2023",
+      "title": "Climate Change and Our Responsibility",
+      "source": "2023年申硕英语真题 Passage 2",
+      "sentences": [
+        {
+          "en": "Climate change is one of the most pressing challenges facing humanity today.",
+          "zh": "气候变化是当今人类面临的最紧迫挑战之一。"
+        },
+        {
+          "en": "Rising global temperatures have led to melting ice caps and rising sea levels.",
+          "zh": "全球气温上升导致冰盖融化和海平面上升。"
+        },
+        {
+          "en": "Many island nations are particularly vulnerable to these environmental changes.",
+          "zh": "许多岛国特别容易受到这些环境变化的影响。"
+        },
+        {
+          "en": "Governments around the world have pledged to reduce carbon emissions by 2050.",
+          "zh": "世界各国政府已承诺到2050年减少碳排放。"
+        },
+        {
+          "en": "But individual actions also matter significantly in addressing this global crisis.",
+          "zh": "但个人行动在应对这一全球危机方面也非常重要。"
+        }
+      ],
+      "questions": [
+        {
+          "q": "According to the passage, who is responsible for fighting climate change?",
+          "options": [
+            "A. Only governments",
+            "B. Only individuals",
+            "C. Both governments and individuals",
+            "D. Only scientists"
+          ],
+          "answer": "C",
+          "analysis": "文章提到政府承诺减排，但个人行动也很重要。"
+        }
+      ]
+    }
+  ]
+}

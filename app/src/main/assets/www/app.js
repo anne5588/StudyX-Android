@@ -3692,7 +3692,7 @@ const app = {
     },
 
     showImportReadingModal() {
-        // 导入英语试卷
+        // 导入英语阅读文章
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
@@ -3702,21 +3702,68 @@ const app = {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     try {
-                        const papers = JSON.parse(event.target.result);
-                        if (Array.isArray(papers)) {
-                            this.readingPapers = [...this.readingPapers, ...papers];
+                        const data = JSON.parse(event.target.result);
+                        let importedCount = 0;
+                        
+                        // 格式1: 包含 articles 数组的批量导入
+                        if (data.articles && Array.isArray(data.articles)) {
+                            data.articles.forEach(article => {
+                                if (this.validateReadingArticle(article)) {
+                                    article.id = Date.now() + Math.random();
+                                    article.favorite = false;
+                                    article.completed = false;
+                                    this.readingPapers.push(article);
+                                    importedCount++;
+                                }
+                            });
+                        }
+                        // 格式2: 单篇文章直接导入
+                        else if (this.validateReadingArticle(data)) {
+                            data.id = Date.now();
+                            data.favorite = false;
+                            data.completed = false;
+                            this.readingPapers.push(data);
+                            importedCount++;
+                        }
+                        // 格式3: 旧版数组格式
+                        else if (Array.isArray(data)) {
+                            data.forEach(article => {
+                                if (this.validateReadingArticle(article)) {
+                                    article.id = Date.now() + Math.random();
+                                    article.favorite = article.favorite || false;
+                                    article.completed = article.completed || false;
+                                    this.readingPapers.push(article);
+                                    importedCount++;
+                                }
+                            });
+                        }
+                        
+                        if (importedCount > 0) {
                             this.saveReadingPapers();
                             this.renderReadingPapers();
-                            this.showToast(`✅ 成功导入 ${papers.length} 套试卷`);
+                            this.showToast(`✅ 成功导入 ${importedCount} 篇文章`);
+                        } else {
+                            alert('导入失败：未找到有效的文章数据\n\n请检查JSON格式是否符合模板要求');
                         }
                     } catch (err) {
-                        alert('导入失败，请检查文件格式');
+                        console.error(err);
+                        alert('导入失败：文件格式错误\n\n请确保上传的是有效的JSON文件');
                     }
                 };
                 reader.readAsText(file);
             }
         };
         input.click();
+    },
+
+    validateReadingArticle(article) {
+        // 验证文章格式是否正确
+        return article && 
+               article.year && 
+               article.title && 
+               Array.isArray(article.sentences) &&
+               article.sentences.length > 0 &&
+               article.sentences.every(s => s.en && s.zh);
     },
 
     exportReadingPapers() {

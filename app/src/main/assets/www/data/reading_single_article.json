@@ -1,0 +1,55 @@
+{
+  "year": "2025",
+  "title": "The Future of Work",
+  "source": "2025年申硕英语真题 Passage 1",
+  "sentences": [
+    {
+      "en": "The nature of work is changing rapidly in the digital age.",
+      "zh": "在数字时代，工作的性质正在迅速变化。"
+    },
+    {
+      "en": "Remote work has become increasingly common since the global pandemic.",
+      "zh": "自全球疫情以来，远程工作变得越来越普遍。"
+    },
+    {
+      "en": "Many companies now offer flexible working arrangements to attract talent.",
+      "zh": "许多公司现在提供灵活的工作安排来吸引人才。"
+    },
+    {
+      "en": "However, this shift also brings new challenges for work-life balance.",
+      "zh": "然而，这种转变也给工作与生活平衡带来了新的挑战。"
+    },
+    {
+      "en": "Employees must learn to set boundaries between their professional and personal lives.",
+      "zh": "员工必须学会在职业生活和个人生活之间设定界限。"
+    },
+    {
+      "en": "Meanwhile, employers need to build trust and focus on results rather than hours worked.",
+      "zh": "与此同时，雇主需要建立信任，关注结果而非工作时长。"
+    }
+  ],
+  "questions": [
+    {
+      "q": "What is the passage mainly about?",
+      "options": [
+        "A. The history of work",
+        "B. Changes in the nature of work",
+        "C. Benefits of office work",
+        "D. Problems with technology"
+      ],
+      "answer": "B",
+      "analysis": "文章主要讨论数字时代工作性质的变化。"
+    },
+    {
+      "q": "What should employers do according to the passage?",
+      "options": [
+        "A. Monitor employees' working hours closely",
+        "B. Focus on results rather than hours",
+        "C. Require everyone to work in the office",
+        "D. Reduce employee benefits"
+      ],
+      "answer": "B",
+      "analysis": "文中提到雇主需要关注结果而非工作时长。"
+    }
+  ]
+}
