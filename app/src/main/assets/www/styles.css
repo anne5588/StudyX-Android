@@ -2007,6 +2007,77 @@ body {
     }
 }
 
+/* ===== 桌面端默认样式 (4列快速开始) ===== */
+.quick-start-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.quick-start-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-start-card:hover {
+    background: var(--bg-hover);
+    transform: translateY(-2px);
+}
+
+.quick-start-card.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+}
+
+.quick-start-card.primary:hover {
+    opacity: 0.95;
+}
+
+.quick-start-card .card-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+    margin-right: 12px;
+    font-size: 24px;
+}
+
+.quick-start-card.primary .card-icon {
+    background: rgba(255,255,255,0.2);
+}
+
+.quick-start-card .card-info {
+    flex: 1;
+}
+
+.quick-start-card .card-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.quick-start-card .card-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.quick-start-card.primary .card-desc {
+    color: rgba(255,255,255,0.8);
+}
+
+.quick-start-card .card-arrow {
+    margin-left: auto;
+    font-size: 20px;
+    color: var(--text-muted);
+}
+
 /* ===== 手机端适配 (小于 480px) - 全新设计 ===== */
 @media (max-width: 480px) {
     :root {
@@ -2230,7 +2301,7 @@ body {
     
     .quick-start-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
     
@@ -5755,5 +5826,723 @@ body {
     .progress-time {
         font-size: 10px;
         min-width: 65px;
+    }
+}
+
+/* ===== 计算器页面 ===== */
+.calculator-header {
+    margin-bottom: 24px;
+}
+
+.calculator-header h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.calculator-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.calc-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+.calc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.calc-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.calc-card h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.calc-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 学习倒计时 */
+.timer-display {
+    font-size: 48px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--primary);
+    font-family: monospace;
+    letter-spacing: 2px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.timer-controls button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timer-controls button:hover {
+    background: var(--primary-dark);
+}
+
+.timer-presets {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.timer-presets button {
+    padding: 6px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.timer-presets button:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+}
+
+/* 复利计算器 */
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-group label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.input-group input {
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.calc-btn {
+    padding: 10px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--secondary);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calc-btn:hover {
+    background: #059669;
+}
+
+.calc-result {
+    padding: 12px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    text-align: center;
+    color: var(--primary-light);
+}
+
+/* 学习时间统计 */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row span:first-child {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.stat-row span:last-child {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 计划完成率 */
+.progress-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.progress-ring svg {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.1);
+    stroke-width: 8;
+}
+
+.progress-ring-fill {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.plan-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 16px;
+}
+
+.plan-stat {
+    text-align: center;
+}
+
+.plan-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.plan-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* ===== 阅读页面 ===== */
+.reading-header {
+    margin-bottom: 24px;
+}
+
+.reading-header h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.reading-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.reading-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: var(--bg-card);
+    padding: 4px;
+    border-radius: var(--radius-md);
+}
+
+.reading-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reading-tab.active {
+    background: var(--primary);
+    color: white;
+}
+
+.reading-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reading-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reading-item:hover {
+    background: var(--bg-hover);
+    transform: translateX(4px);
+}
+
+.reading-cover {
+    width: 60px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.reading-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.reading-info h4 {
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.reading-info p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.reading-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.reading-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.reading-empty .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.reading-empty p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.add-note-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-note-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+    .calculator-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .timer-display {
+        font-size: 36px;
+    }
+    
+    .calc-card {
+        padding: 16px;
+    }
+    
+    .reading-item {
+        padding: 12px;
+    }
+    
+    .reading-cover {
+        width: 50px;
+        height: 70px;
+        font-size: 24px;
+    }
+}
+
+/* ===== 经济计算题库页面 ===== */
+.calc-bank-header {
+    margin-bottom: 20px;
+}
+
+.calc-bank-header h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.calc-bank-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.calc-bank-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.calc-action-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calc-action-btn:hover {
+    background: var(--primary-dark);
+}
+
+.calc-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.calc-filter-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.calc-filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.calc-question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.calc-question-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calc-question-item:hover {
+    background: var(--bg-hover);
+    transform: translateX(4px);
+}
+
+.calc-question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calc-question-type {
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--primary-light);
+    font-size: 12px;
+}
+
+.calc-question-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.calc-question-preview {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.calc-question-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.calc-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.calc-empty .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.calc-empty p {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.calc-empty .empty-tip {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.calc-empty button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ===== 英语阅读理解页面 ===== */
+.reading-header {
+    margin-bottom: 20px;
+}
+
+.reading-header h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.reading-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.reading-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.reading-action-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reading-action-btn:hover {
+    background: var(--primary-dark);
+}
+
+.reading-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.reading-filter-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.reading-filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.reading-paper-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reading-paper-item {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reading-paper-item:hover {
+    background: var(--bg-hover);
+    transform: translateX(4px);
+}
+
+.reading-paper-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reading-paper-year {
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.reading-paper-status {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+
+.reading-paper-status.unread {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-muted);
+}
+
+.reading-paper-status.done {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.reading-paper-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.reading-paper-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.reading-paper-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.reading-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.reading-empty .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.reading-empty p {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.reading-empty .empty-tip {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.reading-empty button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+    .calc-bank-actions,
+    .reading-actions {
+        flex-direction: column;
+    }
+    
+    .calc-action-btn,
+    .reading-action-btn {
+        width: 100%;
     }
 }
