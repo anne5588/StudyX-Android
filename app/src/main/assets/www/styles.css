@@ -6436,6 +6436,12 @@ body {
 /* 题目区域不设置固定高度，根据内容自适应 */
 .calc-detail-section.question-section {
     min-height: auto;
+    height: auto;
+}
+
+.calc-detail-section.question-section .calc-detail-content {
+    min-height: auto;
+    height: auto;
 }
 
 .calc-detail-header-row {
@@ -6589,10 +6595,11 @@ body {
 }
 
 /* 移动端适配 */
-/* 移动端适配 - 全屏紧凑布局 */
+/* 移动端适配 - 紧凑布局，根据内容自适应高度 */
 @media (max-width: 640px) {
     #calc-detail-modal {
         padding: 0;
+        align-items: flex-end;
     }
     
     #calc-detail-modal .modal-header {
@@ -6624,14 +6631,14 @@ body {
     .calc-detail-content {
         width: 100%;
         max-width: 100%;
-        height: 100vh;
-        max-height: 100vh;
-        border-radius: 0;
+        max-height: 90vh;
+        height: auto;
+        border-radius: 20px 20px 0 0;
     }
     
     .calc-detail-body {
         padding: 10px 12px;
-        max-height: calc(100vh - 50px);
+        max-height: calc(90vh - 50px);
     }
     
     .calc-detail-section {

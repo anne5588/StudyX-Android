@@ -296,7 +296,8 @@ const app = {
             day: 'numeric',
             weekday: 'long'
         });
-        document.getElementById('today-date').textContent = dateStr;
+        const todayDateEl = document.getElementById('today-date');
+        if (todayDateEl) todayDateEl.textContent = dateStr;
 
         // 考试倒计时
         this.updateExamCountdown();
@@ -307,8 +308,10 @@ const app = {
         const masteredCount = Object.values(userData.memoryStrength).filter(s => s >= 70).length;
         const reviewCount = this.getTodayReviewCount();
 
-        document.getElementById('today-new').textContent = 3; // 默认新学3个
-        document.getElementById('today-review').textContent = reviewCount;
+        const todayNewEl = document.getElementById('today-new');
+        const todayReviewEl = document.getElementById('today-review');
+        if (todayNewEl) todayNewEl.textContent = 3; // 默认新学3个
+        if (todayReviewEl) todayReviewEl.textContent = reviewCount;
         document.getElementById('today-completed').textContent = userData.completedTasks.length;
         document.getElementById('streak-days').textContent = userData.streakDays;
         document.getElementById('today-review-count').textContent = reviewCount;
