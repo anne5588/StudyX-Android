@@ -1,5 +1,15 @@
 // ===== 经济学学习 & 英语单词学习功能 =====
 
+// 保存app.js中的原始方法（在被覆盖之前）
+const originalAppMethods = {
+    markWord: app.markWord,
+    showWordMeaning: app.showWordMeaning,
+    prevWord: app.prevWord,
+    nextWord: app.nextWord,
+    renderCurrentWord: app.renderCurrentWord,
+    updateVocabStats: app.updateVocabStats
+};
+
 // 扩展app对象
 Object.assign(app, {
     // 当前学习状态
@@ -117,6 +127,47 @@ Object.assign(app, {
                         <div class="content-text">${content}</div>
                     </div>
                     
+                    <!-- 极简伴读组件 -->
+                    <div class="audio-companion">
+                        <div class="companion-header">
+                            <span class="companion-icon">🎤</span>
+                            <span class="companion-title">语音伴读</span>
+                            <span class="companion-status" id="companion-status-${id}">点击录音</span>
+                        </div>
+                        <div class="companion-body">
+                            <!-- 进度条 -->
+                            <div class="progress-container">
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" id="companion-progress-${id}"></div>
+                                </div>
+                                <span class="progress-time" id="companion-time-${id}">00:00 / 00:00</span>
+                            </div>
+                            <!-- 控制按钮 -->
+                            <div class="companion-controls" id="companion-controls-${id}">
+                                <button class="companion-btn record" id="btn-record-${id}" onclick="app.toggleCompanionRecord('${id}')" title="录音">
+                                    <span class="btn-icon">🎤</span>
+                                    <span class="btn-text">录音</span>
+                                </button>
+                                <button class="companion-btn play" id="btn-play-${id}" onclick="app.playCompanionAudio('${id}')" title="播放" style="display:none;">
+                                    <span class="btn-icon">▶</span>
+                                    <span class="btn-text">播放</span>
+                                </button>
+                                <button class="companion-btn pause" id="btn-pause-${id}" onclick="app.pauseCompanionAudio('${id}')" title="暂停" style="display:none;">
+                                    <span class="btn-icon">⏸</span>
+                                    <span class="btn-text">暂停</span>
+                                </button>
+                                <button class="companion-btn stop" id="btn-stop-${id}" onclick="app.stopCompanionAudio('${id}')" title="停止" disabled>
+                                    <span class="btn-icon">⏹</span>
+                                    <span class="btn-text">停止</span>
+                                </button>
+                            </div>
+                            <!-- 音波动画 -->
+                            <div class="audio-waves" id="companion-waves-${id}" style="display:none;">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     ${item.tip ? `
                         <div class="content-section tip-section">
                             <h4>💡 记忆技巧</h4>
@@ -158,8 +209,201 @@ Object.assign(app, {
     
     // 关闭经济法学习界面
     closeEconLawStudy() {
+        // 停止伴读音频
+        if (this.companionAudio) {
+            this.companionAudio.pause();
+            this.companionAudio = null;
+        }
+        if (this.companionRecorder && this.companionRecorder.state === 'recording') {
+            this.companionRecorder.stop();
+        }
         document.getElementById('econlaw-study-modal').style.display = 'none';
         this.currentEconLawId = null;
+    },
+    
+    // ========== 极简伴读组件 ==========
+    companionRecorder: null,
+    companionAudio: null,
+    companionAudioChunks: [],
+    companionRecordingId: null,
+    
+    // 切换录音状态
+    async toggleCompanionRecord(id) {
+        const btnRecord = document.getElementById(`btn-record-${id}`);
+        const btnPlay = document.getElementById(`btn-play-${id}`);
+        const btnStop = document.getElementById(`btn-stop-${id}`);
+        const statusEl = document.getElementById(`companion-status-${id}`);
+        const wavesEl = document.getElementById(`companion-waves-${id}`);
+        
+        if (!this.companionRecorder || this.companionRecorder.state === 'inactive') {
+            // 开始录音
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.companionRecorder = new MediaRecorder(stream);
+                this.companionAudioChunks = [];
+                this.companionRecordingId = id;
+                
+                this.companionRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        this.companionAudioChunks.push(e.data);
+                    }
+                };
+                
+                this.companionRecorder.onstop = () => {
+                    const audioBlob = new Blob(this.companionAudioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // 保存到 localStorage
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        localStorage.setItem(`companion_audio_${id}`, reader.result);
+                        this.updateCompanionUI(id, 'recorded');
+                    };
+                    reader.readAsDataURL(audioBlob);
+                    
+                    // 停止所有音频轨道
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                this.companionRecorder.start();
+                
+                // 更新UI
+                btnRecord.innerHTML = '<span class="btn-icon">⏹</span><span class="btn-text">停止</span>';
+                btnRecord.classList.add('recording');
+                statusEl.textContent = '正在录音...';
+                statusEl.classList.add('recording');
+                wavesEl.style.display = 'flex';
+                
+            } catch (err) {
+                console.error('录音失败:', err);
+                alert('录音失败，请检查麦克风权限');
+            }
+        } else {
+            // 停止录音
+            this.companionRecorder.stop();
+            btnRecord.innerHTML = '<span class="btn-icon">🎤</span><span class="btn-text">录音</span>';
+            btnRecord.classList.remove('recording');
+            statusEl.textContent = '录音完成';
+            statusEl.classList.remove('recording');
+            wavesEl.style.display = 'none';
+        }
+    },
+    
+    // 播放伴读音频
+    playCompanionAudio(id) {
+        const savedAudio = localStorage.getItem(`companion_audio_${id}`);
+        if (!savedAudio) {
+            alert('暂无录音，请先录制伴读');
+            return;
+        }
+        
+        // 如果正在播放其他音频，先停止
+        if (this.companionAudio) {
+            this.companionAudio.pause();
+        }
+        
+        this.companionAudio = new Audio(savedAudio);
+        
+        // 更新UI
+        this.updateCompanionUI(id, 'playing');
+        
+        // 监听进度
+        this.companionAudio.ontimeupdate = () => {
+            this.updateCompanionProgress(id);
+        };
+        
+        this.companionAudio.onended = () => {
+            this.updateCompanionUI(id, 'stopped');
+        };
+        
+        this.companionAudio.play();
+    },
+    
+    // 暂停伴读音频
+    pauseCompanionAudio(id) {
+        if (this.companionAudio) {
+            this.companionAudio.pause();
+            this.updateCompanionUI(id, 'paused');
+        }
+    },
+    
+    // 停止伴读音频
+    stopCompanionAudio(id) {
+        if (this.companionAudio) {
+            this.companionAudio.pause();
+            this.companionAudio.currentTime = 0;
+            this.updateCompanionUI(id, 'stopped');
+        }
+    },
+    
+    // 更新伴读UI状态
+    updateCompanionUI(id, state) {
+        const btnRecord = document.getElementById(`btn-record-${id}`);
+        const btnPlay = document.getElementById(`btn-play-${id}`);
+        const btnPause = document.getElementById(`btn-pause-${id}`);
+        const btnStop = document.getElementById(`btn-stop-${id}`);
+        const statusEl = document.getElementById(`companion-status-${id}`);
+        const wavesEl = document.getElementById(`companion-waves-${id}`);
+        const savedAudio = localStorage.getItem(`companion_audio_${id}`);
+        
+        switch(state) {
+            case 'recorded':
+                btnRecord.style.display = 'inline-flex';
+                btnRecord.innerHTML = '<span class="btn-icon">🎤</span><span class="btn-text">重录</span>';
+                btnPlay.style.display = 'inline-flex';
+                btnPause.style.display = 'none';
+                btnStop.disabled = true;
+                statusEl.textContent = '已保存，可播放';
+                wavesEl.style.display = 'none';
+                break;
+            case 'playing':
+                btnRecord.style.display = 'none';
+                btnPlay.style.display = 'none';
+                btnPause.style.display = 'inline-flex';
+                btnStop.disabled = false;
+                statusEl.textContent = '正在播放...';
+                wavesEl.style.display = 'flex';
+                break;
+            case 'paused':
+                btnRecord.style.display = 'none';
+                btnPlay.style.display = 'inline-flex';
+                btnPause.style.display = 'none';
+                btnStop.disabled = false;
+                statusEl.textContent = '已暂停';
+                wavesEl.style.display = 'none';
+                break;
+            case 'stopped':
+                btnRecord.style.display = 'inline-flex';
+                btnRecord.innerHTML = savedAudio ? '<span class="btn-icon">🎤</span><span class="btn-text">重录</span>' : '<span class="btn-icon">🎤</span><span class="btn-text">录音</span>';
+                btnPlay.style.display = savedAudio ? 'inline-flex' : 'none';
+                btnPause.style.display = 'none';
+                btnStop.disabled = true;
+                statusEl.textContent = savedAudio ? '已保存，可播放' : '点击录音';
+                wavesEl.style.display = 'none';
+                document.getElementById(`companion-progress-${id}`).style.width = '0%';
+                break;
+        }
+    },
+    
+    // 更新进度条
+    updateCompanionProgress(id) {
+        if (!this.companionAudio) return;
+        
+        const progress = (this.companionAudio.currentTime / this.companionAudio.duration) * 100;
+        document.getElementById(`companion-progress-${id}`).style.width = `${progress}%`;
+        
+        // 更新时间显示
+        const current = this.formatTime(this.companionAudio.currentTime);
+        const total = this.formatTime(this.companionAudio.duration || 0);
+        document.getElementById(`companion-time-${id}`).textContent = `${current} / ${total}`;
+    },
+    
+    // 格式化时间
+    formatTime(seconds) {
+        if (isNaN(seconds)) return '00:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     },
     
     studyEconLaw(id, status) {
@@ -275,6 +519,13 @@ Object.assign(app, {
     },
     
     renderWordCard() {
+        // 修复：检查是否在使用econLawApp的词汇界面（vocab-card-container是该界面的特有元素）
+        const vocabCardContainer = document.getElementById('vocab-card-container');
+        if (!vocabCardContainer) {
+            // 如果不存在，说明正在使用app.js的词汇学习界面，不执行渲染
+            return;
+        }
+        
         const levelNames = {
             basic: '基础词汇',
             intermediate: '中级词汇',
@@ -282,7 +533,7 @@ Object.assign(app, {
             phrase: '词组搭配'
         };
         
-        if (this.currentVocabWords.length === 0) {
+        if (!this.currentVocabWords || this.currentVocabWords.length === 0) {
             // 无词汇时仍保留组别选择器，让用户可以切换
             document.getElementById('vocab-card-container').innerHTML = `
                 <div class="vocab-card empty">
@@ -344,6 +595,15 @@ Object.assign(app, {
     
     // 上一个单词
     prevWord() {
+        // 修复：检查是否在使用app.js的界面
+        const vocabCardContainer = document.getElementById('vocab-card-container');
+        if (!vocabCardContainer) {
+            // 如果vocab-card-container不存在，说明正在使用app.js的界面
+            if (originalAppMethods.prevWord) {
+                return originalAppMethods.prevWord.call(this);
+            }
+            return;
+        }
         if (this.currentWordIndex > 0) {
             this.currentWordIndex--;
             this.renderWordCard();
@@ -352,6 +612,15 @@ Object.assign(app, {
     
     // 下一个单词
     nextWord() {
+        // 修复：检查是否在使用app.js的界面
+        const vocabCardContainer = document.getElementById('vocab-card-container');
+        if (!vocabCardContainer) {
+            // 如果vocab-card-container不存在，说明正在使用app.js的界面
+            if (originalAppMethods.nextWord) {
+                return originalAppMethods.nextWord.call(this);
+            }
+            return;
+        }
         if (this.currentWordIndex < this.currentVocabWords.length - 1) {
             this.currentWordIndex++;
             this.renderWordCard();
@@ -359,13 +628,42 @@ Object.assign(app, {
     },
     
     showWordMeaning() {
-        document.getElementById('meaning-section').style.display = 'block';
-        document.getElementById('show-meaning-btn').style.display = 'none';
-        document.getElementById('feedback-btns').style.display = 'flex';
+        // 修复：检查是否在使用app.js的界面
+        const vocabCardContainer = document.getElementById('vocab-card-container');
+        if (!vocabCardContainer) {
+            // 如果vocab-card-container不存在，说明正在使用app.js的界面
+            if (originalAppMethods.showWordMeaning) {
+                return originalAppMethods.showWordMeaning.call(this);
+            }
+            return;
+        }
+        
+        // 修复：添加空值检查，避免元素不存在时报错
+        const meaningSection = document.getElementById('meaning-section');
+        const showMeaningBtn = document.getElementById('show-meaning-btn');
+        const feedbackBtns = document.getElementById('feedback-btns');
+        
+        if (meaningSection) meaningSection.style.display = 'block';
+        if (showMeaningBtn) showMeaningBtn.style.display = 'none';
+        if (feedbackBtns) feedbackBtns.style.display = 'flex';
     },
     
     markWord(result) {
+        // 修复：检查是否在使用app.js的界面
+        const vocabCardContainer = document.getElementById('vocab-card-container');
+        if (!vocabCardContainer) {
+            // 如果vocab-card-container不存在，说明正在使用app.js的界面
+            if (originalAppMethods.markWord) {
+                return originalAppMethods.markWord.call(this, result);
+            }
+            return;
+        }
+        
         const word = this.currentVocabWords[this.currentWordIndex];
+        if (!word || !word.word) {
+            return;
+        }
+        
         const now = new Date();
         
         if (!userVocabularyProgress[word.word]) {
@@ -433,16 +731,35 @@ Object.assign(app, {
     },
     
     updateVocabStats() {
+        // 修复：检查是否在使用app.js的界面
+        // 通过检查vocab-card-container元素是否存在来判断（这是econLawApp界面的特有元素）
+        const vocabCardContainer = document.getElementById('vocab-card-container');
+        if (!vocabCardContainer) {
+            // 如果vocab-card-container不存在，说明正在使用app.js的界面
+            if (originalAppMethods.updateVocabStats) {
+                return originalAppMethods.updateVocabStats.call(this);
+            }
+            return;
+        }
+        
+        // 以下是econLawApp的统计逻辑（只统计当前学习的词汇）
         const total = Object.keys(userVocabularyProgress).length;
         const newWords = Object.values(userVocabularyProgress).filter(p => p.status === 'new').length;
         const learning = Object.values(userVocabularyProgress).filter(p => p.status === 'learning').length;
         const mastered = Object.values(userVocabularyProgress).filter(p => p.status === 'mastered').length;
         
-        document.getElementById('vocab-total').textContent = total;
-        document.getElementById('vocab-new').textContent = newWords;
-        document.getElementById('vocab-learning').textContent = learning;
-        document.getElementById('vocab-mastered').textContent = mastered;
-        document.getElementById('vocab-badge').textContent = learning;
+        // 修复：添加空值检查，避免元素不存在时报错
+        const vocabTotal = document.getElementById('vocab-total');
+        const vocabNew = document.getElementById('vocab-new');
+        const vocabLearning = document.getElementById('vocab-learning');
+        const vocabMastered = document.getElementById('vocab-mastered');
+        const vocabBadge = document.getElementById('vocab-badge');
+        
+        if (vocabTotal) vocabTotal.textContent = total;
+        if (vocabNew) vocabNew.textContent = newWords;
+        if (vocabLearning) vocabLearning.textContent = learning;
+        if (vocabMastered) vocabMastered.textContent = mastered;
+        if (vocabBadge) vocabBadge.textContent = learning;
     },
     
     // ========== 词汇导入 ==========
@@ -539,12 +856,15 @@ const originalSwitchPage = app.switchPage;
 app.switchPage = function(page) {
     originalSwitchPage.call(this, page);
     
+    // 只处理经济法页面，词汇页面由app.js处理
     if (page === 'econlaw') {
         this.renderEconLawGrid();
-    } else if (page === 'vocabulary') {
-        this.initVocabulary();
-        this.renderImportedList();
     }
+    // 移除vocabulary的处理，避免覆盖app.js的功能
+    // else if (page === 'vocabulary') {
+    //     this.initVocabulary();
+    //     this.renderImportedList();
+    // }
 };
 
 // 初始化经济法筛选事件

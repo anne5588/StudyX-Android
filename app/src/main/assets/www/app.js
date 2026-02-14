@@ -1092,7 +1092,11 @@ const app = {
         examDate.setHours(0, 0, 0, 0);
         
         const daysLeft = Math.ceil((examDate - today) / (1000 * 60 * 60 * 24));
-        document.getElementById('exam-countdown').textContent = daysLeft;
+        const countdownEl = document.getElementById('exam-countdown');
+        const countdownMobileEl = document.getElementById('exam-countdown-mobile');
+        
+        if (countdownEl) countdownEl.textContent = daysLeft;
+        if (countdownMobileEl) countdownMobileEl.textContent = daysLeft;
         
         // 保存当前考试日期供后续使用
         this.currentExamDate = examDateStr;
@@ -2094,6 +2098,12 @@ const app = {
         this.currentGroupWords = words;
         
         if (words.length === 0) {
+            // 清空单词显示区域
+            const wordEl = document.getElementById('current-word');
+            const phoneticEl = document.getElementById('current-phonetic');
+            if (wordEl) wordEl.textContent = '';
+            if (phoneticEl) phoneticEl.textContent = '';
+            
             // 显示空数据提示
             const meaningSection = document.getElementById('meaning-section');
             if (meaningSection) {
@@ -2102,9 +2112,16 @@ const app = {
                     <div class="vocab-empty">
                         <span class="empty-icon">📚</span>
                         <p>暂无词汇数据</p>
+                        <p style="font-size: 13px; margin-top: 8px; color: var(--text-secondary);">请先导入词汇或选择其他等级</p>
                     </div>
                 `;
             }
+            
+            // 隐藏按钮
+            const showMeaningBtn = document.getElementById('show-meaning-btn');
+            const feedbackBtns = document.getElementById('feedback-btns');
+            if (showMeaningBtn) showMeaningBtn.style.display = 'none';
+            if (feedbackBtns) feedbackBtns.style.display = 'none';
             return;
         }
         
@@ -2155,7 +2172,8 @@ const app = {
         if (showMeaningBtn) {
             showMeaningBtn.textContent = '显示答案';
             showMeaningBtn.style.display = 'inline-block';
-            showMeaningBtn.onclick = () => this.showWordAnswer(wordData);
+            // 修复：不使用闭包，而是在点击时动态获取当前单词
+            showMeaningBtn.onclick = () => this.showWordMeaning();
         }
         if (feedbackBtns) feedbackBtns.style.display = 'none';
     },
@@ -2203,6 +2221,7 @@ const app = {
 
     // 标记单词学习状态
     markWord(status) {
+        console.log('markWord called:', status, 'currentGroupWords length:', this.currentGroupWords.length, 'currentWordIndex:', this.currentWordIndex);
         try {
             const currentWord = this.currentGroupWords[this.currentWordIndex];
             if (!currentWord) {
@@ -2275,7 +2294,15 @@ const app = {
                 this.currentWordIndex = 0;
                 
                 // 自动切换到下一组
-                const maxGroups = Object.keys(vocabularyData[this.currentVocabLevel === 'basic' ? 'basicVocabulary' : 'intermediateVocabulary'] || {}).length;
+                let vocabKey;
+                switch(this.currentVocabLevel) {
+                    case 'basic': vocabKey = 'basicVocabulary'; break;
+                    case 'intermediate': vocabKey = 'intermediateVocabulary'; break;
+                    case 'advanced': vocabKey = 'advancedVocabulary'; break;
+                    case 'phrase': vocabKey = 'phrases'; break;
+                    default: vocabKey = 'basicVocabulary';
+                }
+                const maxGroups = Object.keys(vocabularyData[vocabKey] || {}).length;
                 if (this.currentVocabGroup < maxGroups) {
                     this.currentVocabGroup++;
                     this.initGroupSelector();
@@ -2300,7 +2327,16 @@ const app = {
         } else if (this.currentVocabGroup > 1) {
             // 切换到上一组
             this.currentVocabGroup--;
-            const words = vocabularyData.basicVocabulary[this.currentVocabGroup] || [];
+            // 修复：根据当前等级获取词汇数据
+            let vocabKey;
+            switch(this.currentVocabLevel) {
+                case 'basic': vocabKey = 'basicVocabulary'; break;
+                case 'intermediate': vocabKey = 'intermediateVocabulary'; break;
+                case 'advanced': vocabKey = 'advancedVocabulary'; break;
+                case 'phrase': vocabKey = 'phrases'; break;
+                default: vocabKey = 'basicVocabulary';
+            }
+            const words = vocabularyData[vocabKey][this.currentVocabGroup] || [];
             this.currentWordIndex = words.length - 1;
             this.initGroupSelector();
             this.renderCurrentWord();
@@ -2315,7 +2351,16 @@ const app = {
             this.renderCurrentWord();
         } else {
             // 切换到下一组
-            const maxGroups = Object.keys(vocabularyData.basicVocabulary || {}).length;
+            // 修复：根据当前等级获取最大组数
+            let vocabKey;
+            switch(this.currentVocabLevel) {
+                case 'basic': vocabKey = 'basicVocabulary'; break;
+                case 'intermediate': vocabKey = 'intermediateVocabulary'; break;
+                case 'advanced': vocabKey = 'advancedVocabulary'; break;
+                case 'phrase': vocabKey = 'phrases'; break;
+                default: vocabKey = 'basicVocabulary';
+            }
+            const maxGroups = Object.keys(vocabularyData[vocabKey] || {}).length;
             if (this.currentVocabGroup < maxGroups) {
                 this.currentVocabGroup++;
                 this.currentWordIndex = 0;
@@ -2444,16 +2489,13 @@ const app = {
             }
             
             // 更新明细列表 - 分别更新三个数字
-            const detailEl = document.getElementById(`${level.key}-detail`);
-            if (detailEl) {
-                const totalSpan = detailEl.querySelector('.detail-total');
-                const learningSpan = detailEl.querySelector('.detail-learning');
-                const masteredSpan = detailEl.querySelector('.detail-mastered');
-                
-                if (totalSpan) totalSpan.textContent = wordCount || '-';
-                if (learningSpan) learningSpan.textContent = learningCount || '-';
-                if (masteredSpan) masteredSpan.textContent = masteredCount || '-';
-            }
+            const totalSpan = document.getElementById(`${level.key}-total`);
+            const learningSpan = document.getElementById(`${level.key}-learning`);
+            const masteredSpan = document.getElementById(`${level.key}-mastered`);
+            
+            if (totalSpan) totalSpan.textContent = wordCount || '-';
+            if (learningSpan) learningSpan.textContent = learningCount || '-';
+            if (masteredSpan) masteredSpan.textContent = masteredCount || '-';
         });
         
         // 更新总统计
@@ -2914,15 +2956,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 点击弹窗外部关闭
-document.getElementById('knowledge-modal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) {
-        app.closeModal();
-    }
-});
+const knowledgeModal = document.getElementById('knowledge-modal');
+if (knowledgeModal) {
+    knowledgeModal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            app.closeModal();
+        }
+    });
+}
 
 // 视频弹窗外部关闭
-document.getElementById('video-modal').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) {
-        app.closeVideoModal();
-    }
-});
+const videoModal = document.getElementById('video-modal');
+if (videoModal) {
+    videoModal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+            app.closeVideoModal();
+        }
+    });
+}

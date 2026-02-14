@@ -142,10 +142,22 @@
                     </div>
                     
                     <div class="welcome-card">
-                        <div class="welcome-avatar">🧠</div>
-                        <div class="welcome-text-content">
-                            <h2>你好！我是小忆，你的AI学习助手 🎯</h2>
-                            <p>今天是 <span id="today-date"></span>，坚持就是胜利！根据艾宾浩斯遗忘曲线，今天有 <strong id="today-review-count">--</strong> 个知识点需要复习。</p>
+                        <div class="welcome-left">
+                            <div class="welcome-avatar">🧠</div>
+                            <div class="welcome-text-content">
+                                <h2>小忆助手</h2>
+                                <p>今日需复习 <strong id="today-review-count">--</strong> 个</p>
+                            </div>
+                        </div>
+                        <div class="welcome-countdown" onclick="app.showExamDateModal()">
+                            <div class="countdown-icon">⏰</div>
+                            <div class="countdown-content">
+                                <div class="countdown-label">考试倒计时</div>
+                                <div class="countdown-days">
+                                    <span id="exam-countdown-mobile">--</span>
+                                    <span class="countdown-unit">天</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -342,35 +354,27 @@
                             </div>
                             <div class="detail-item">
                                 <span class="detail-name">📗 基础词汇</span>
-                                <span id="basic-detail">
-                                    <span class="detail-total">-</span>
-                                    <span class="detail-learning">-</span>
-                                    <span class="detail-mastered">-</span>
-                                </span>
+                                <span class="detail-total" id="basic-total">-</span>
+                                <span class="detail-learning" id="basic-learning">-</span>
+                                <span class="detail-mastered" id="basic-mastered">-</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-name">📙 中级词汇</span>
-                                <span id="intermediate-detail">
-                                    <span class="detail-total">-</span>
-                                    <span class="detail-learning">-</span>
-                                    <span class="detail-mastered">-</span>
-                                </span>
+                                <span class="detail-total" id="intermediate-total">-</span>
+                                <span class="detail-learning" id="intermediate-learning">-</span>
+                                <span class="detail-mastered" id="intermediate-mastered">-</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-name">📘 高级词汇</span>
-                                <span id="advanced-detail">
-                                    <span class="detail-total">-</span>
-                                    <span class="detail-learning">-</span>
-                                    <span class="detail-mastered">-</span>
-                                </span>
+                                <span class="detail-total" id="advanced-total">-</span>
+                                <span class="detail-learning" id="advanced-learning">-</span>
+                                <span class="detail-mastered" id="advanced-mastered">-</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-name">📕 词组搭配</span>
-                                <span id="phrase-detail">
-                                    <span class="detail-total">-</span>
-                                    <span class="detail-learning">-</span>
-                                    <span class="detail-mastered">-</span>
-                                </span>
+                                <span class="detail-total" id="phrase-total">-</span>
+                                <span class="detail-learning" id="phrase-learning">-</span>
+                                <span class="detail-mastered" id="phrase-mastered">-</span>
                             </div>
                         </div>
                     </div>
