@@ -3160,11 +3160,17 @@ const app = {
             return;
         }
 
-        container.innerHTML = questions.map((q, index) => `
+        container.innerHTML = questions.map((q, index) => {
+            const masteryIcons = { none: '', fuzzy: '🤔', mastered: '✅' };
+            const masteryClass = q.mastery || 'none';
+            return `
             <div class="calc-question-item" onclick="app.openCalcQuestion(${index})">
                 <div class="calc-question-header">
                     <span class="calc-question-type">${this.getCalcTypeName(q.type)}</span>
-                    <span style="font-size:12px;color:var(--text-muted)">${q.date || ''}</span>
+                    <div class="calc-question-badges">
+                        <span class="calc-mastery-badge ${masteryClass}">${masteryIcons[masteryClass]}</span>
+                        <span style="font-size:12px;color:var(--text-muted)">${q.year || ''}年</span>
+                    </div>
                 </div>
                 <div class="calc-question-title">${q.title}</div>
                 <div class="calc-question-preview">${q.content}</div>
@@ -3173,7 +3179,7 @@ const app = {
                     <span>📖 ${q.analysis ? '已有解析' : '暂无解析'}</span>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     },
 
     getCalcTypeName(type) {
@@ -3268,6 +3274,7 @@ const app = {
     },
 
     openCalcQuestion(index) {
+        this.currentCalcIndex = index;
         const q = this.calcQuestions[index];
         const modal = document.getElementById('calc-detail-modal');
         const body = document.getElementById('calc-detail-body');
@@ -3275,10 +3282,30 @@ const app = {
         
         if (!modal || !body) return;
         
+        const mastery = q.mastery || 'none';
+        const masteryOptions = [
+            { key: 'none', label: '未掌握', icon: '❌', color: '#ef4444' },
+            { key: 'fuzzy', label: '模糊', icon: '🤔', color: '#f59e0b' },
+            { key: 'mastered', label: '已掌握', icon: '✅', color: '#10b981' }
+        ];
+        
         title.textContent = q.title;
         body.innerHTML = `
             <div class="calc-detail-section question-section">
-                <div class="calc-detail-type">${this.getCalcTypeName(q.type)} · ${q.year || ''}年真题</div>
+                <div class="calc-detail-header-row">
+                    <div class="calc-detail-type">${this.getCalcTypeName(q.type)} · ${q.year || ''}年真题</div>
+                    <div class="calc-mastery-selector">
+                        ${masteryOptions.map(opt => `
+                            <button class="calc-mastery-btn ${mastery === opt.key ? 'active' : ''}" 
+                                    onclick="app.setCalcMastery(${index}, '${opt.key}')"
+                                    style="--mastery-color: ${opt.color}"
+                                    title="${opt.label}">
+                                <span>${opt.icon}</span>
+                                <span>${opt.label}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
                 <div class="calc-detail-content">${this.formatCalcContent(q.content)}</div>
             </div>
             
@@ -3302,6 +3329,17 @@ const app = {
         
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    },
+
+    setCalcMastery(index, level) {
+        if (this.calcQuestions[index]) {
+            this.calcQuestions[index].mastery = level;
+            this.saveCalcQuestions();
+            // 重新渲染弹窗中的状态按钮
+            this.openCalcQuestion(index);
+            // 刷新列表
+            this.renderCalcQuestions();
+        }
     },
 
     toggleCalcAnswer(btn) {
