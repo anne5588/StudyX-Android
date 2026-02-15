@@ -22,7 +22,7 @@
                 </li>
                 <li class="nav-item" data-page="econlaw">
                     <span class="nav-icon">⚖️</span>
-                    <span class="nav-text">经济法学习</span>
+                    <span class="nav-text">经济法学</span>
                 </li>
                 <li class="nav-item" data-page="vocabulary">
                     <span class="nav-icon">🔤</span>
@@ -62,7 +62,7 @@
                 </li>
             </ul>
             
-            <!-- 备份数据按钮（放在菜单外避免事件冲突） -->
+            <!-- 备份数据按钮（放在菜单外避免事件冲突）-->
             <div class="nav-backup-wrapper">
                 <button class="nav-backup-btn" onclick="if(window.backupRestoreUI){backupRestoreUI.showModal()}else{alert('备份模块未加载，请刷新页面')}"
                         title="备份或恢复学习数据">
@@ -84,7 +84,7 @@
             </div>
         </nav>
 
-        <!-- 手机端专用底部导航 -->
+        <!-- 手机端专用底部导航-->
         <nav class="mobile-nav" style="display: none;">
             <div class="mobile-nav-item active" data-page="today">
                 <span class="nav-icon">📅</span>
@@ -110,7 +110,7 @@
 
         <!-- 主内容区 -->
         <main class="main-content">
-            <!-- 顶部栏 -->
+            <!-- 顶部栏-->
             <header class="header">
                 <h1 class="page-title" id="page-title">今日任务</h1>
                 <div class="header-actions">
@@ -150,7 +150,7 @@
                             </div>
                         </div>
                         <div class="welcome-countdown" onclick="app.showExamDateModal()">
-                            <div class="countdown-icon">⏰</div>
+                            <div class="countdown-icon">📅</div>
                             <div class="countdown-content">
                                 <div class="countdown-label">考试倒计时</div>
                                 <div class="countdown-days">
@@ -165,17 +165,17 @@
                         <div class="stat-card">
                             <span class="stat-icon">📚</span>
                             <span class="stat-value" id="today-new">--</span>
-                            <span class="stat-label">新学知识点</span>
+                            <span class="stat-label">新学知识天</span>
                         </div>
                         <div class="stat-card">
                             <span class="stat-icon">🔄</span>
                             <span class="stat-value" id="today-review">--</span>
-                            <span class="stat-label">待复习</span>
+                            <span class="stat-label">待复天</span>
                         </div>
                         <div class="stat-card">
-                            <span class="stat-icon">✅</span>
+                            <span class="stat-icon">天</span>
                             <span class="stat-value" id="today-completed">--</span>
-                            <span class="stat-label">已完成</span>
+                            <span class="stat-label">已完天</span>
                         </div>
                         <div class="stat-card">
                             <span class="stat-icon">🔥</span>
@@ -187,53 +187,53 @@
                     <div class="today-tasks">
                         <h3>📋 今日学习任务</h3>
                         <div class="task-list" id="today-task-list">
-                            <!-- 动态生成 -->
+                            <!-- 动态生成-->
                         </div>
                     </div>
 
-                    <!-- 快速开始 - 新设计 -->
+                    <!-- 快速开始 - 新设计-->
                     <div class="quick-start-section">
                         <h3 class="section-title">⚡ 快速开始</h3>
                         <div class="quick-start-grid">
                             <div class="quick-start-card primary" onclick="app.startStudy()">
                                 <div class="card-icon">📖</div>
                                 <div class="card-info">
-                                    <span class="card-title">开始学习</span>
-                                    <span class="card-desc">继续上次的进度</span>
+                                    <span class="card-title">开始学天</span>
+                                    <span class="card-desc">继续上次的进天</span>
                                 </div>
-                                <span class="card-arrow">›</span>
+                                <span class="card-arrow">天</span>
                             </div>
                             <div class="quick-start-card" onclick="app.startQuiz()">
                                 <div class="card-icon">🎲</div>
                                 <div class="card-info">
                                     <span class="card-title">随机抽测</span>
-                                    <span class="card-desc">检验记忆效果</span>
+                                    <span class="card-desc">检验记忆效天</span>
                                 </div>
-                                <span class="card-arrow">›</span>
+                                <span class="card-arrow">天</span>
                             </div>
                             <div class="quick-start-card" onclick="app.startReview()">
                                 <div class="card-icon">🔄</div>
                                 <div class="card-info">
-                                    <span class="card-title">开始复习</span>
-                                    <span class="card-desc">今日需复习 0 个</span>
+                                    <span class="card-title">开始复天</span>
+                                    <span class="card-desc">今日需复习 0 天</span>
                                 </div>
-                                <span class="card-arrow">›</span>
+                                <span class="card-arrow">天</span>
                             </div>
                             <div class="quick-start-card english" onclick="app.switchPage('vocabulary')">
                                 <div class="card-icon">🔤</div>
                                 <div class="card-info">
                                     <span class="card-title">英语学习</span>
-                                    <span class="card-desc">词汇学习与复习</span>
+                                    <span class="card-desc">词汇学习与复天</span>
                                 </div>
-                                <span class="card-arrow">›</span>
+                                <span class="card-arrow">天</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 经济法学习页面 -->
+                <!-- 经济法学习页面-->
                 <div class="page" id="page-econlaw">
-                    <!-- 顶部工具栏 -->
+                    <!-- 顶部工具栏-->
                     <div class="econlaw-toolbar">
                         <div class="toolbar-search">
                             <span class="search-icon">🔍</span>
@@ -245,12 +245,12 @@
                                 💾
                             </button>
                             <button class="toolbar-btn primary" onclick="app.showAddKnowledgeModal()" title="添加知识点">
-                                ➕
+                                +
                             </button>
                         </div>
                     </div>
                     
-                    <!-- 掌握程度筛选 -->
+                    <!-- 掌握程度筛选-->
                     <div class="mastery-filter">
                         <button class="mastery-btn active" data-mastery="all">全部</button>
                         <button class="mastery-btn" data-mastery="fuzzy">😵 没记住</button>
@@ -258,7 +258,7 @@
                         <button class="mastery-btn" data-mastery="mastered">😎 已掌握</button>
                     </div>
                     
-                    <!-- 分类标签（点击选中/取消） -->
+                    <!-- 分类标签（点击选中/取消）-->
                     <div class="module-filter">
                         <button class="filter-btn" data-module="socialism">社会主义市场经济</button>
                         <button class="filter-btn" data-module="fiscal">财政学</button>
@@ -267,7 +267,7 @@
                         <button class="filter-btn" data-module="western">西方经济学</button>
                     </div>
                     
-                    <!-- 题型筛选（点击选中/取消） -->
+                    <!-- 题型筛选（点击选中/取消）-->
                     <div class="type-filter">
                         <button class="type-btn" data-type="term">名词解释</button>
                         <button class="type-btn" data-type="choice">选择题</button>
@@ -275,15 +275,18 @@
                     </div>
 
                     <div class="knowledge-grid" id="econlaw-grid">
-                        <!-- 动态生成知识卡片 -->
+                        <!-- 动态生成知识卡片-->
                     </div>
                 </div>
 
-                <!-- 英语单词页面 - 简洁首页 -->
+                <!-- 英语单词页面 - 简洁首页-->
                 <div class="page" id="page-vocabulary">
                     <div class="page-header">
                         <h2>🔤 英语单词学习</h2>
                         <div class="toolbar-actions">
+                            <button class="toolbar-btn" onclick="smartVocabImport.showSmartImportModal()" title="智能导入">
+                                +
+                            </button>
                             <button class="toolbar-btn" onclick="app.showVocabDataModal()" title="导入/导出">
                                 💾
                             </button>
@@ -301,7 +304,7 @@
                                         <span class="level-count" id="basic-count">加载中...</span>
                                     </div>
                                 </div>
-                                <span class="level-arrow">›</span>
+                                <span class="level-arrow">天</span>
                             </div>
                             <div class="vocab-level-card" onclick="app.startVocabStudy('intermediate')">
                                 <div class="level-info">
@@ -311,7 +314,7 @@
                                         <span class="level-count" id="intermediate-count">加载中...</span>
                                     </div>
                                 </div>
-                                <span class="level-arrow">›</span>
+                                <span class="level-arrow">天</span>
                             </div>
                             <div class="vocab-level-card" onclick="app.startVocabStudy('advanced')">
                                 <div class="level-info">
@@ -321,7 +324,7 @@
                                         <span class="level-count" id="advanced-count">加载中...</span>
                                     </div>
                                 </div>
-                                <span class="level-arrow">›</span>
+                                <span class="level-arrow">天</span>
                             </div>
                             <div class="vocab-level-card" onclick="app.startVocabStudy('phrase')">
                                 <div class="level-info">
@@ -331,23 +334,33 @@
                                         <span class="level-count" id="phrase-count">加载中...</span>
                                     </div>
                                 </div>
-                                <span class="level-arrow">›</span>
+                                <span class="level-arrow">天</span>
                             </div>
+                        </div>
+                        
+                        <!-- 词汇游戏入口 -->
+                        <div class="vocab-game-entry" onclick="vocabGames.showGameMenu()">
+                            <div class="game-entry-icon">🎮</div>
+                            <div class="game-entry-text">
+                                <h3>词汇游戏</h3>
+                                <p>通过游戏轻松记忆单词</p>
+                            </div>
+                            <div class="game-entry-arrow">›</div>
                         </div>
                         
                         <!-- 学习统计 -->
                         <div class="vocab-stats-simple">
                             <div class="vocab-stat-item">
                                 <span class="stat-num" id="vocab-total">0</span>
-                                <span class="stat-label">总词汇</span>
+                                <span class="stat-label">总词天</span>
                             </div>
                             <div class="vocab-stat-item">
                                 <span class="stat-num" id="vocab-learning">0</span>
-                                <span class="stat-label">学习中</span>
+                                <span class="stat-label">学习天</span>
                             </div>
                             <div class="vocab-stat-item">
                                 <span class="stat-num" id="vocab-mastered">0</span>
-                                <span class="stat-label">已掌握</span>
+                                <span class="stat-label">已掌天</span>
                             </div>
                         </div>
                         
@@ -356,9 +369,9 @@
                             <h4>📊 学习明细</h4>
                             <div class="detail-header">
                                 <span>等级</span>
-                                <span>总词汇</span>
-                                <span>学习中</span>
-                                <span>已掌握</span>
+                                <span>总词天</span>
+                                <span>学习天</span>
+                                <span>已掌天</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-name">📗 基础词汇</span>
@@ -391,7 +404,7 @@
                 <!-- 全屏单词学习界面 -->
                 <div class="fullscreen-modal" id="vocab-study-modal" style="display: none;">
                     <div class="fullscreen-header">
-                        <button class="back-btn" onclick="app.closeVocabStudy()">‹ 返回</button>
+                        <button class="back-btn" onclick="app.closeVocabStudy()">← 返回</button>
                         <span class="fullscreen-title" id="vocab-study-title">基础词汇</span>
                         <select class="group-selector" id="group-selector" onchange="app.switchGroup(this.value)">
                             <option value="1">第1组</option>
@@ -529,7 +542,7 @@
                         </div>
                         <div class="result-stats">
                             <div class="result-item">
-                                <span class="result-label">总题数</span>
+                                <span class="result-label">总题天</span>
                                 <span class="result-value" id="result-total">10</span>
                             </div>
                             <div class="result-item">
@@ -537,7 +550,7 @@
                                 <span class="result-value mastered" id="result-mastered">0</span>
                             </div>
                             <div class="result-item">
-                                <span class="result-label">一般</span>
+                                <span class="result-label">一天</span>
                                 <span class="result-value normal" id="result-normal">0</span>
                             </div>
                             <div class="result-item">
@@ -580,7 +593,7 @@
                             <button class="priority-btn" onclick="app.startPriorityReview('normal')">开始复习</button>
                         </div>
                         <div class="priority-card mastered">
-                            <div class="priority-icon">✅</div>
+                            <div class="priority-icon">🧠</div>
                             <div class="priority-info">
                                 <h4>长期记忆</h4>
                                 <p>记忆强度 &gt; 70%，间隔复习</p>
@@ -593,7 +606,7 @@
                     <div class="review-schedule">
                         <h3>📅 今日复习计划</h3>
                         <div class="schedule-list" id="review-schedule-list">
-                            <!-- 动态生成 -->
+                            <!-- 动态生成-->
                         </div>
                     </div>
                 </div>
@@ -609,17 +622,17 @@
                             </div>
                         </div>
                         <div class="overview-card">
-                            <span class="overview-icon">✅</span>
+                            <span class="overview-icon">天</span>
                             <div class="overview-info">
                                 <span class="overview-value" id="learned-knowledge">0</span>
-                                <span class="overview-label">已学习</span>
+                                <span class="overview-label">已学天</span>
                             </div>
                         </div>
                         <div class="overview-card">
                             <span class="overview-icon">🎯</span>
                             <div class="overview-info">
                                 <span class="overview-value" id="mastered-rate">0%</span>
-                                <span class="overview-label">掌握率</span>
+                                <span class="overview-label">掌握天</span>
                             </div>
                         </div>
                         <div class="overview-card">
@@ -635,13 +648,13 @@
                         <div class="chart-card">
                             <h4>模块掌握度</h4>
                             <div class="module-progress" id="module-progress">
-                                <!-- 动态生成 -->
+                                <!-- 动态生成-->
                             </div>
                         </div>
                         <div class="chart-card">
-                            <h4>近7天学习趋势</h4>
+                            <h4>7天学习趋势</h4>
                             <div class="trend-chart" id="trend-chart">
-                                <!-- 简化的柱状图 -->
+                                <!-- 简化的柱状图-->
                             </div>
                         </div>
                     </div>
@@ -649,7 +662,7 @@
                     <div class="stats-achievements">
                         <h4>🏆 学习成就</h4>
                         <div class="achievements-grid" id="achievements-grid">
-                            <!-- 动态生成 -->
+                            <!-- 动态生成-->
                         </div>
                     </div>
                 </div>
@@ -664,14 +677,14 @@
                             <button class="cal-nav-btn" onclick="app.nextMonth()">▶</button>
                         </div>
                         <div class="calendar-grid" id="calendar-grid">
-                            <!-- 动态生成日历 -->
+                            <!-- 动态生成日历-->
                         </div>
                     </div>
 
                     <div class="schedule-detail" id="schedule-detail">
                         <h3>📋 今日详细安排</h3>
                         <div class="detail-content" id="schedule-detail-content">
-                            <!-- 动态生成 -->
+                            <!-- 动态生成-->
                         </div>
                     </div>
                 </div>
@@ -683,23 +696,23 @@
                         <div class="videos-stats">
                             <div class="video-stat">
                                 <span class="stat-num" id="video-total">0</span>
-                                <span class="stat-label">总课程</span>
+                                <span class="stat-label">总课天</span>
                             </div>
                             <div class="video-stat">
                                 <span class="stat-num" id="video-watched">0</span>
-                                <span class="stat-label">已观看</span>
+                                <span class="stat-label">已观天</span>
                             </div>
                             <div class="video-stat">
                                 <span class="stat-num" id="video-skipped">0</span>
-                                <span class="stat-label">已跳过</span>
+                                <span class="stat-label">已跳天</span>
                             </div>
                             <div class="video-stat">
                                 <span class="stat-num" id="video-review">0</span>
-                                <span class="stat-label">已复习</span>
+                                <span class="stat-label">已复天</span>
                             </div>
                             <div class="video-stat">
                                 <span class="stat-num" id="video-progress">0%</span>
-                                <span class="stat-label">总进度</span>
+                                <span class="stat-label">总进天</span>
                             </div>
                         </div>
                     </div>
@@ -719,11 +732,11 @@
                         <button class="filter-btn" data-filter="watched">已观看</button>
                         <button class="filter-btn" data-filter="skipped">已跳过</button>
                         <button class="filter-btn" data-filter="reviewed">已复习</button>
-                        <button class="filter-btn" data-filter="missed">漏看</button>
+                        <button class="filter-btn" data-filter="missed">漏看</button></button>
                     </div>
 
                     <div class="videos-list" id="videos-list">
-                        <!-- 动态生成视频列表 -->
+                        <!-- 动态生成视频列表-->
                     </div>
                 </div>
 
@@ -744,7 +757,7 @@
                                 </div>
                             </div>
                             <div class="editor-form">
-                                <!-- 自动生成：今日学习 -->
+                                <!-- 自动生成：今日学习-->
                                 <div class="form-group auto-section">
                                     <label>📚 今日学习（自动生成）</label>
                                     <div class="auto-content" id="daily-auto-content">
@@ -752,13 +765,13 @@
                                     </div>
                                 </div>
                                 
-                                <!-- 手动填写：学习感受 -->
+                                <!-- 手动填写：学习感受-->
                                 <div class="form-group">
                                     <label>💭 学习感受 / 难点 / 收获</label>
                                     <textarea id="daily-feeling" rows="5" placeholder="今天学得怎么样？有什么不懂的地方？有什么收获？"></textarea>
                                 </div>
                                 
-                                <!-- 手动填写：明日计划 -->
+                                <!-- 手动填写：明日计划-->
                                 <div class="form-group">
                                     <label>📅 明日计划</label>
                                     <textarea id="daily-plan" rows="2" placeholder="明天打算学什么？"></textarea>
@@ -771,7 +784,7 @@
                         <div class="daily-list">
                             <h3>📋 历史日报</h3>
                             <div class="daily-items" id="daily-items">
-                                <!-- 动态生成日报列表 -->
+                                <!-- 动态生成日报列表-->
                             </div>
                         </div>
                     </div>
@@ -785,7 +798,7 @@
                             <button class="modal-close" onclick="app.closeDailyModal()">×</button>
                         </div>
                         <div class="modal-body" id="daily-modal-body">
-                            <!-- 动态生成日报详情 -->
+                            <!-- 动态生成日报详情-->
                         </div>
                     </div>
                 </div>
@@ -822,7 +835,7 @@
                             <select id="month-selector" onchange="app.loadMonthlyReport(this.value)">
                                 <option value="">选择月份...</option>
                                 <option value="2026-02">2026年2月</option>
-                                <option value="2026-03">2026年3月</option>
+                                <option value="2026-03">2026年2月</option>
                             </select>
                             <button class="generate-btn" onclick="app.generateMonthlyReport()">🔄 生成本月月报</button>
                         </div>
@@ -846,7 +859,7 @@
                                 <span>导入</span>
                             </button>
                             <button class="calc-action-btn" onclick="app.showAddCalcModal()">
-                                <span class="icon">➕</span>
+                                <span class="icon">天</span>
                                 <span>新建</span>
                             </button>
                             <button class="calc-action-btn" onclick="app.exportCalcQuestions()">
@@ -865,7 +878,7 @@
                     </div>
 
                     <div class="calc-question-list" id="calc-question-list">
-                        <!-- 计算题列表动态生成 -->
+                        <!-- 计算题列表动态生成-->
                         <div class="calc-empty">
                             <span class="empty-icon">📚</span>
                             <p>暂无计算题</p>
@@ -884,7 +897,7 @@
                                 <span class="icon">📤</span><span>导入</span>
                             </button>
                             <button class="reading-action-btn" onclick="app.toggleReadingMode()">
-                                <span class="icon">👁️</span><span>全译</span>
+                                <span class="icon">👁天</span><span>全译</span>
                             </button>
                         </div>
                     </div>
@@ -898,11 +911,11 @@
                     </div>
 
                     <div class="reading-paper-list" id="reading-paper-list">
-                        <!-- 英语文章列表动态生成 -->
+                        <!-- 英语文章列表动态生成-->
                     </div>
                 </div>
 
-                <!-- 阅读详情页（点读模式） -->
+                <!-- 阅读详情页（点读模式）-->
                 <div class="page" id="page-reading-detail" style="display: none;">
                     <div class="reading-detail-header">
                         <button class="back-btn" onclick="app.closeReadingDetail()">← 返回</button>
@@ -912,8 +925,15 @@
                         <button class="favorite-btn" onclick="app.toggleReadingFavorite()" id="reading-fav-btn">🤍</button>
                     </div>
                     
+                    <!-- ML Kit 翻译状态提示-->
+                    <div class="mlkit-translate-hint" id="mlkit-translate-hint" style="display: none;">
+                        <span class="hint-icon">🤖</span>
+                        <span>点击句子即可使用 AI 本地翻译</span>
+                        <button class="mlkit-download-btn" onclick="app.downloadMlKitModel()" id="mlkit-download-btn">下载模型</button>
+                    </div>
+                    
                     <div class="reading-detail-content" id="reading-detail-content">
-                        <!-- 点读内容动态生成 -->
+                        <!-- 点读内容动态生成-->
                     </div>
                     
                     <div class="reading-detail-toolbar">
@@ -925,15 +945,15 @@
         </main>
     </div>
 
-    <!-- 经济法学习全屏界面 -->
+    <!-- 经济法学习全屏界面-->
     <div class="fullscreen-modal" id="econlaw-study-modal" style="display: none;">
         <div class="fullscreen-header">
-            <button class="back-btn" onclick="app.closeEconLawStudy()">‹ 返回</button>
-            <span class="fullscreen-title" id="econlaw-study-module">经济法学习</span>
+            <button class="back-btn" onclick="app.closeEconLawStudy()">← 返回</button>
+            <span class="fullscreen-title" id="econlaw-study-module">经济法学天</span>
             <span></span>
         </div>
         <div class="fullscreen-content" id="econlaw-study-content">
-            <!-- 动态生成 -->
+            <!-- 动态生成-->
         </div>
     </div>
 
@@ -942,7 +962,7 @@
         <div class="modal-content">
             <button class="modal-close" onclick="app.closeVideoModal()">×</button>
             <div class="modal-body" id="video-modal-body">
-                <!-- 动态生成 -->
+                <!-- 动态生成-->
             </div>
         </div>
     </div>
@@ -974,7 +994,7 @@
                     
                     <div class="form-group">
                         <label>分组编号</label>
-                        <input type="number" id="import-group" value="1" min="1" placeholder="如：1、2、3...">
+                        <input type="number" id="import-group" value="1" min="1" placeholder="如：1、2...">
                     </div>
                     
                     <div class="form-group">
@@ -1008,7 +1028,7 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
         </div>
     </div>
 
-    <!-- 计算题详情弹窗 -->
+    <!-- 计算题详情弹窗-->
     <div class="modal" id="calc-detail-modal" style="display: none;">
         <div class="modal-content calc-detail-content">
             <div class="modal-header">
@@ -1016,7 +1036,7 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
                 <button class="modal-close" onclick="app.closeCalcDetailModal()">×</button>
             </div>
             <div class="modal-body calc-detail-body" id="calc-detail-body">
-                <!-- 内容动态填充 -->
+                <!-- 内容动态填充-->
             </div>
         </div>
     </div>
@@ -1078,7 +1098,7 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
                         <div class="profile-avatar">👤</div>
                         <div class="profile-info">
                             <h3 id="profile-username">用户名</h3>
-                            <p id="profile-joined">注册时间：--</p>
+                            <p id="profile-joined">注册时间：-</p>
                         </div>
                     </div>
                     <div class="profile-stats">
@@ -1102,9 +1122,15 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
 
     <script src="data.js?v=2"></script>
     <script src="econLawData.js?v=2"></script>
+    <script src="coreDictionary.js?v=1"></script>
     <script src="vocabularyData.js?v=4"></script>
     <script src="noteAndRestore.js?v=2"></script>
     <script src="app.js?v=4"></script>
+    <script src="aiDictation.js?v=1"></script>
+    <script src="vocabGames.js?v=1"></script>
+    <script src="smartVocabImport.js?v=1"></script>
+    <script src="smartDictionary.js?v=1"></script>
+    <script src="readingAssistant.js?v=2"></script>
     <script src="econLawApp.js?v=2"></script>
     
     <!-- 登录功能模块 -->
@@ -1230,7 +1256,7 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
             
             const result = loginSystem.login(username, password);
             if (result.success) {
-                this._showMessage('登录成功！', 'success');
+                this._showMessage('登录成功！, 'success');
                 this._updateProfileView();
             } else {
                 this._showMessage(result.error, 'error');
@@ -1258,7 +1284,7 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
         },
         
         logout() {
-            if (confirm('确定要退出登录吗？')) {
+            if (confirm('确定要退出登录吗？'))) {
                 loginSystem.logout();
                 this.switchTab('login');
                 this._updateProfileView();
@@ -1325,14 +1351,14 @@ example,/ɪɡˈzæmpl/,n. 例子</pre>
         
         // 确保备份模块初始化
         if (window.backupRestoreUI) {
-            console.log('[Init] 初始化备份模块...');
+            console.log('[Init] 初始化备份模块..');
             backupRestoreUI.init();
         } else {
             console.error('[Init] 备份模块未加载！');
         }
     </script>
     
-    <!-- 版本号显示 -->
+    <!-- 版本号显示-->
     <div class="app-version" style="position: fixed; bottom: 60px; right: 10px; font-size: 11px; color: var(--text-secondary); opacity: 0.6; z-index: 100;">v1.0.2</div>
 </body>
 </html>
