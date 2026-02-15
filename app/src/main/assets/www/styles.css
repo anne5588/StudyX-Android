@@ -9445,3 +9445,283 @@ body {
     margin-bottom: 8px;
     opacity: 0.6;
 }
+
+/* ===== 听写输入区域样式 ===== */
+
+.dictation-input-area {
+    padding: 16px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    margin: 16px 0;
+}
+
+.input-label {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.input-wrapper textarea {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.8);
+    color: #f8fafc;
+    font-size: 15px;
+    line-height: 1.6;
+    resize: none;
+    transition: border-color 0.2s;
+}
+
+.input-wrapper textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.input-wrapper textarea::placeholder {
+    color: #64748b;
+}
+
+.input-mic-btn {
+    width: 48px;
+    min-width: 48px;
+    height: auto;
+    border: 2px solid rgba(99, 102, 241, 0.3);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.8);
+    font-size: 22px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-mic-btn:hover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.input-mic-btn.recording {
+    background: #ef4444;
+    border-color: #ef4444;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.input-status {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+    text-align: center;
+}
+
+.dictation-input-area .char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+/* ===== 学习热力图样式 ===== */
+
+.heatmap-section {
+    margin: 20px 16px;
+    padding: 20px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 16px;
+}
+
+.heatmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.heatmap-header h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #f8fafc;
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.legend-item {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.heatmap-container {
+    overflow-x: auto;
+    padding: 8px 0;
+}
+
+.heatmap-wrapper {
+    display: inline-block;
+    min-width: 100%;
+}
+
+.heatmap-months {
+    display: flex;
+    gap: 3px;
+    margin-bottom: 8px;
+    margin-left: 30px;
+}
+
+.heatmap-months span {
+    width: 14px;
+    font-size: 11px;
+    color: #64748b;
+    text-align: center;
+}
+
+.heatmap-months .month-label {
+    width: auto;
+    min-width: 28px;
+    text-align: left;
+}
+
+.heatmap-grid-wrapper {
+    display: flex;
+    gap: 4px;
+}
+
+.heatmap-weekdays {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.weekday-label {
+    height: 14px;
+    font-size: 10px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.heatmap-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 1fr);
+    grid-auto-flow: column;
+    gap: 3px;
+}
+
+.heatmap-cell {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+    z-index: 10;
+}
+
+.heatmap-stats {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.heatmap-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.heatmap-stat-item {
+    text-align: center;
+}
+
+.heatmap-stat-item .stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    color: #6366f1;
+    line-height: 1.2;
+}
+
+.heatmap-stat-item .stat-label {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* 移动端适配 */
+@media (max-width: 600px) {
+    .heatmap-stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .heatmap-cell {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .heatmap-months span {
+        width: 12px;
+    }
+}
+
+/* 邮箱备份弹窗样式 */
+.email-backup-content {
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.backup-stats {
+    animation: fadeIn 0.5s ease 0.1s both;
+}
+
+.export-btn {
+    transition: all 0.2s;
+}
+
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.export-btn:active {
+    transform: translateY(0);
+}
